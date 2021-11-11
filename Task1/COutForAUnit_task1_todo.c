@@ -29,7 +29,10 @@ bool Equals(void) {
 }
 
 void ResetBuffer(void) {
-    // Your code...
+    for (n = 0; n < BufferMax; n++) {
+        buffer[n][0] = '\0';
+    }
+    n = 0;
 }
 
 static void putBuffer(char c) {
