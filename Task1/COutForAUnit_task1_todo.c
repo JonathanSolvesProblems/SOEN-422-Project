@@ -45,7 +45,7 @@ static void __putchar(char c) {
 #define getchar()  bsl_Uart_RxChar()
 
 void PutC(char c)        { __putchar(c); }
-void PutS(const char* s) { while (*s) PutC(*s++); }
+void PutS(const char* s) { while (*s) if (s != NULL) PutC(*s++); }
 void PutN(void)          { PutC('\n'); }
 
 char GetC(void)          { return getchar(); }
