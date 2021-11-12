@@ -1,6 +1,7 @@
 #include "bsl_Uart.h" 
 
 #include <avr/io.h>
+#include <stdbool.h>
 
 #define BaudRate9600 ((uint16_t)(103))
 

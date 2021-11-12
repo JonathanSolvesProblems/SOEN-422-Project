@@ -25,20 +25,20 @@ bool Equals(void) {
     if (overflow) return false;
 
     // Comparing expected and current outputs.
-    // Your code...
-
-    return false;
+    return strcmp(buffer[1], buffer[2]) == 0;
 }
 
 void ResetBuffer(void) {
-    for (n = 0; n < BufferMax; n++) {
+    for (n = 0; n < nBuffers; n++) {
         buffer[n][0] = '\0';
     }
     n = 0;
 }
 
 static void putBuffer(char c) {
-    // Your code...
+    /*if (c == '\n') To think about...
+        bufferNum++;*/
+    buffer[n][0] = c;
 }
 
 // AUnit's putchar to store output characters in AUnit's buffers.
