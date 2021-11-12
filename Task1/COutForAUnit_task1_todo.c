@@ -5,8 +5,10 @@
 #include "COutForAUnit.h"
 #include "bsl_Uart.h"
 
-#define nBuffers  3
-#define BufferMax 40
+#define nBuffers  (3)
+#define BufferMax (40)
+#define ShiftByFour (4)
+#define ShiftByEight (8)
 
 // buffer[0] is the test name.
 // buffer[1] is the expected output.
@@ -56,18 +58,28 @@ char GetC(void)          { return getchar(); }
 /*---------------------------------------------------------------------------
  * PutX4 - PutHexNibble - print a nibble as an hex digit character.
  *-------------------------------------------------------------------------*/
-void PutX4(uint8_t n) {
-    // Your code...
+void PutX4(uint8_t n) { 
+    n &= 0xF; // first four bits
+
+    if (n >= 10) {
+        n = n - 10 + 'A';
+    } else {
+        n = n + '0';
+    }
+    
+    PutC(n);   
 }
 /*---------------------------------------------------------------------------
  * PutX8 - PutHexByte - print a byte (uint8_t) as two hex digit characters.
  *-------------------------------------------------------------------------*/
 void PutX8(uint8_t b) {
-    // Your code...
+    PutX4(b >> ShiftByFour);
+    PutX4(b);
 }
 /*---------------------------------------------------------------------------
  * PutX16 - PutHexWord - print a word (uint16_t) as four hex digit characters.
  *-------------------------------------------------------------------------*/
 void PutX16(uint16_t w) {
-    // Your code...
+    PutX8((uint8_t)(w >> ShiftByEight));
+    PutX8((uint8_t)w);
 }
