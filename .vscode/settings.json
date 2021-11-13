@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "cstdio": "c",
+        "bsl_uart.h": "c"
+    }
+}
