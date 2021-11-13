@@ -7,7 +7,7 @@
 #include "DumpMemory.h"
 
 #if !defined(Host)
-#include "bsl_Uart.h"
+#include "../Task1/bsl_Uart.h"
 #endif
 
 /*-------------------------------------------------------------------
