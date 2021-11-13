@@ -1,0 +1,1 @@
+gcc DumpMemory.c ../Task1/COutForAUnit_task1_todo.c ../Task1/bsl_UsartByPolling.c TestDumpMemory.c -D Host
