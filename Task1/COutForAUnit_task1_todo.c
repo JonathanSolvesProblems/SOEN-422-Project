@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include "COutForAUnit.h"
+
 #include "bsl_Uart.h"
 
 #define nBuffers  (3)
@@ -37,7 +38,7 @@ void ResetBuffer(void) {
 
 static void putBuffer(char c) {
     /*if (c == '\n') To think about...
-        bufferNum++;*/
+        bufferNum++; your code...*/
     buffer[n][0] = c;
 }
 
@@ -67,7 +68,7 @@ void PutX4(uint8_t n) {
         n = n + '0';
     }
     
-    PutC(n);   
+    PutC(n);
 }
 /*---------------------------------------------------------------------------
  * PutX8 - PutHexByte - print a byte (uint8_t) as two hex digit characters.

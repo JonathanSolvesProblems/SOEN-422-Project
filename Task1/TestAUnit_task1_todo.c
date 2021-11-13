@@ -1,6 +1,7 @@
 // TestAUnit_task1_todo.c - Test AUnit for Arduino Nano.
 
 #include "COutForAUnit.h"
+
 #include "bsl_Uart.h"
 
 #include <stdint.h>
@@ -30,6 +31,10 @@ static TestEntry  tests[TestMax] = {
 //  Test9
 };
 
+#if defined(Host)
+    #include <stdio.h>
+#endif
+
 /*-------------------------------------------------------------------
  * main
  *-------------------------------------------------------------------*/
@@ -44,9 +49,9 @@ int main(void) {
 
     while (testRun) {
         PutS("$ ");
-        char cmd = GetC();
-
-        // Your code...
+        // char cmd = GetC();
+        
+        // your code...
 
     }
     PutS("bye!\n");
