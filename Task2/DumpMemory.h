@@ -1,3 +1,9 @@
+/* DumpMemory.h - Dump Memory Function Interface
+//
+// Copyright (C) 1985-2021 by Michel de Champlain
+//
+*/
+
 #ifndef __DumpMemory_h
 #define __DumpMemory_h
 
