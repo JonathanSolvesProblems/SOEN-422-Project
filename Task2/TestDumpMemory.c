@@ -23,7 +23,7 @@ int main(void) {
 
 #if !defined(Host)
     bsl_Uart_Init();
-    DumpMemory( (uint8_t*)0, 32); // 32 registers on Nano.
+    DumpMemory((uint8_t*)0, 32); // 32 registers on Nano.
 #endif
 
     DumpMemory(mem, 32); // Based 'mem' address (0x0100) on SRAM data.

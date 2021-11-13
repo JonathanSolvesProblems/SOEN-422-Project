@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "bsl_uart.h": "c",
+        "string.h": "c"
+    }
+}
