@@ -28,8 +28,8 @@ void bsl_Uart_Init(void) {
     if (!initialized) { // To make sure it will be done only once.
           // Set baud rate
           UBRR0 = BaudRate9600;
-          // Enable receiver only.
-          UCSR0B = (1<<RXEN0);
+          // Enable receiver and transmiter.
+          UCSR0B = (1<<RXEN0) | (1 << TXEN0);
           // sets the frame format with 8 data bits and 1 stop bit.
           UCSR0C = (1<<USBS0)|(1<<UCSZ00)|(1<<UCSZ01);
         
