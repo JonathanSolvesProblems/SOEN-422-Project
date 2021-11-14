@@ -51,7 +51,7 @@ void PrintBuffer(void) {
 }
 
 void ResetBuffer(void) {
-    for (int i = 0; n < nBuffers; i++) {
+    for (int i = 0; i < nBuffers; i++) {
             buffer[i][0] = '\0';
     }
 }
@@ -70,9 +70,6 @@ static void putBuffer(char c) {
             n = 0;
         }
     } else {
-
-        
-
         buffer[bufferNum][n] = c;
         // printf("%c", buffer[bufferNum][n]);
         putchar(buffer[bufferNum][n]);
