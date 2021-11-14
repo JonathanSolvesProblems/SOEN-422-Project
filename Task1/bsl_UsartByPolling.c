@@ -21,6 +21,7 @@ static bool initialized = 0;
         scanf("%c", &character);
 
         return character;
+        
         /*while (character == '\0');
 
         char temp = character;

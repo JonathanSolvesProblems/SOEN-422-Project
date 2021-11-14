@@ -10,7 +10,7 @@
     #include <stdio.h>
 #endif
 
-#define nBuffers  (3)
+#define nBuffers  (3) 
 #define BufferMax (40)
 #define ShiftByFour (4)
 #define ShiftByEight (8)
@@ -33,7 +33,7 @@ bool StartsWith(const char* line, const char* with) {
 }
 
 bool Equals(void) {
-    if (overflow) return false;
+    if (overflow) return false; // TODO: Add message if overflowed?
 
     // printf("Buffer 0: %s\n", buffer[0]);
     // printf("Buffer 1: %s\n", buffer[1]);
@@ -63,17 +63,18 @@ static void putBuffer(char c) {
         // printf("\nTEST putBuffer \n: %s", buffer[bufferNum]);
         if (bufferNum < 2) {
              bufferNum++;
+             putchar('\n');
              n = 0;
         } else {
             // ResetBuffer();
+            putchar('\n');
             bufferNum = 0;
             n = 0;
         }
     } else {
-        /*if (c == '.') {
-            printf("dot detected, n is %d and bufferNum is %d", n, bufferNum);
-        }*/
         buffer[bufferNum][n] = c;
+        // printf("%c", buffer[bufferNum][n]);
+        putchar(buffer[bufferNum][n]);
         n++;
     }
 }

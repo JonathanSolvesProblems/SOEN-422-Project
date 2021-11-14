@@ -30,7 +30,7 @@ static void Test2(void) {
 
 typedef void (*TestEntry)(void);
 
-#define TestMax  4  // Up to 9.
+#define TestMax  9  // Up to 9.
 
 static TestEntry tests[TestMax] = {
     Test1,
@@ -40,6 +40,8 @@ static TestEntry tests[TestMax] = {
 //  ...
 //  Test9
 };
+
+
 
 uint8_t charToU8(char c) {
     return (c - '0');
@@ -58,7 +60,7 @@ int main(void) {
 
     bool testRun = true;
 
-    char lineInBuffer[MaxLineSize];
+    char temp[MaxLineSize][MaxLineSize];
 
     /*PutS("Test AUnit on Arduino Nano v1.0\n");
     PutS("Usage: Enter <n> where n is the test number 1..");
@@ -68,52 +70,68 @@ int main(void) {
     printf("Usage: Enter <n> where n is the test number 1..");
     printf("%d", TestMax); 
     printf(" or '0' (zero) to quit.\n");*/
-
-    uint8_t reading = 0;
+    
+    uint8_t dollarChecker = 1;
 
     while (testRun) {
-        // PutS("$ ");
+        if (dollarChecker) {
+            PutS("$ ");
+            dollarChecker = 0;
+        } else {
+            dollarChecker = 1;
+        }
 
         // ResetBuffer();
         // printf("$ ");
+        uint8_t cmd = GetC();
         
-        char cmd = GetC();
+        
         // printf("HERE: %d", charToU8(cmd));
 
-        uint8_t cmdInt = charToU8(cmd);
+        int cmdInt = charToU8(cmd);
+
+        if (cmdInt == 218) {
+            // PutS("\n");
+            continue;
+        }
+        
+        // printf("%d", cmdInt);
         
         if (cmd == '0') {
+            // printf("HERE");
             break; // TODO: Will clean this up when it works.
-        } else if (cmd == '1' || cmd == '2' || cmd == '3' || cmd == '4' || cmd == '5' || cmd == '6' || cmd == '7'
-        || cmd == '8' || cmd == '9') {
+        } else if (cmdInt >= 1 && cmdInt <= TestMax) {
             if (tests[cmdInt - 1] == NULL) {
                 PutS("Test \"");
-                PutS(cmd + "");
+                // PutS(cmd + "");
+                PutS(&cmd);
                 PutS("\" not referred.\n");
                 // printf("Test \"%d\" not referred.\n", cmdInt);
             } else {
+                 // printf("HERE");
                  tests[cmdInt - 1]();
                  if(Equals()) {
                      // printf("DEBUG: In Equals");
-                     // PutS(".\n");
+                     PutS(".\n");
                      // printf(".\n");
                  } else {
-                     // PutS("F\n");
+                     PutS("F\n");
                      // printf("F\n");
                  }
             }
         } else if (cmdInt > TestMax) {
+            // printf("HERE");
             PutS("Invalid test number. It should be 1..");
-            PutS(intToChar(TestMax) + "");
+            // PutS(intToChar(TestMax) + "");
+            // PutS(TestMax);
             PutS("or \"0\" (zero) to quit.\n");
             // printf("Invalid test number. It should be 1..%d or \"0\" (zero) to quit.\n", TestMax);
         }
         // printf("PRINTING...");
-        PrintBuffer();
-        break;
-    }
+        // PrintBuffer();
+    } 
     
-    // PutS("bye!\n");
+    PutS("bye!\n");
     
     // printf("bye!\n");
     return 0;
