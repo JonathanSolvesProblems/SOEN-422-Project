@@ -42,7 +42,11 @@ static TestEntry tests[TestMax] = {
 };
 
 uint8_t charToU8(char c) {
-    return c - '0';
+    return (c - '0');
+}
+
+char intToChar(uint8_t u8) {
+    return (u8 + '0');
 }
 
 /*-------------------------------------------------------------------
@@ -74,7 +78,7 @@ int main(void) {
         || cmd == '8' || cmd == '9') {
             if (tests[cmdInt - 1] == NULL) {
                 PutS("Test \"");
-                PutS(cmd);
+                PutS("cmd");
                 PutS("\" not referred.\n");
                 // printf("Test \"%d\" not referred.\n", cmdInt);
             } else {
@@ -88,7 +92,9 @@ int main(void) {
                  }
             }
         } else if (cmd > TestMax) {
-            PutS("Invalid test number. It should be 1..2 or \"0\" (zero) to quit.\n");
+            PutS("Invalid test number. It should be 1..");
+            PutS("TestMax");
+            PutS("or \"0\" (zero) to quit.\n");
             // printf("Invalid test number. It should be 1..%d or \"0\" (zero) to quit.\n", TestMax);
         }
     }
