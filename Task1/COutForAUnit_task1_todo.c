@@ -37,9 +37,14 @@ void ResetBuffer(void) {
 }
 
 static void putBuffer(char c) {
-    /*if (c == '\n') To think about...
-        bufferNum++; your code...*/
-    buffer[n][0] = c;
+    buffer[n][bufferNum] = c;
+    if (c == '\n')
+        if (bufferNum < 3)
+            bufferNum++;
+        else {
+            bufferNum = 0;
+            n++;
+        }
 }
 
 // AUnit's putchar to store output characters in AUnit's buffers.
