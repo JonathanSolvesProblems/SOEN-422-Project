@@ -6,6 +6,10 @@
 
 #include "bsl_Uart.h"
 
+#if defined(Host)
+    #include <stdio.h>
+#endif
+
 #define nBuffers  (3)
 #define BufferMax (40)
 #define ShiftByFour (4)
@@ -27,6 +31,14 @@ bool Equals(void) {
 
     // Comparing expected and current outputs.
     return strcmp(buffer[1], buffer[2]) == 0;
+}
+
+void PrintBuffer(void) {
+    for(int i = 0; i < nBuffers; i++) {
+        for(int j = 0; j < BufferMax; j++) {
+            printf("%c", buffer[i][j]);
+        }
+    }
 }
 
 void ResetBuffer(void) {
