@@ -26,8 +26,18 @@ static bool     overflow = false;
 
 void _PutS(const char* s) { while (*s) bsl_Uart_TxChar(*s++); }
 
+// TESTING
+bool StartsWith(const char* line, const char* with) {
+    int withLength = strlen(with);
+    return strncmp(line, with, withLength) == 0;
+}
+
 bool Equals(void) {
     if (overflow) return false;
+
+    // printf("Buffer 0: %s\n", buffer[0]);
+    // printf("Buffer 1: %s\n", buffer[1]);
+    // printf("Buffer 2: %s\n", buffer[2]);
 
     // Comparing expected and current outputs.
     return strcmp(buffer[1], buffer[2]) == 0;
@@ -35,43 +45,35 @@ bool Equals(void) {
 
 void PrintBuffer(void) {
     for(int i = 0; i < nBuffers; i++) {
-        for(int j = 0; j < BufferMax; j++) {
-            printf("%c", buffer[i][j]);
-        }
+        //for(int j = 0; j < BufferMax; j++) {
+            printf("%s\n", buffer[i]);
+        //}
+        // printf("");
     }
 }
 
 void ResetBuffer(void) {
-    for(int i = 0; i < nBuffers; i++) {
-        for(int j = 0; j < BufferMax; j++) {
-            buffer[i][j] = '\0';
-        }
-    }
-    /*
     for (n = 0; n < nBuffers; n++) {
         buffer[n][0] = '\0';
     }
-    n = 0;*/
+    n = 0;
 }
 
-bool StartsWith(const char* line, const char* with) {
-    int withLength = strlen(with);
-    return strncmp(line, with, withLength) == 0;
-}
+
 
 static void putBuffer(char c) {
-    buffer[bufferNum][n] = c;
-    n++;
-
-    /*if (c == '\n')
+    if (c == '\n') {
         if (bufferNum < 3) {
-            bufferNum++;
-            n = 0;
-        }
-        else {
+             bufferNum++;
+             n = 0; 
+        } else {
             bufferNum = 0;
             n = 0;
-        }*/
+        }
+    } else {
+        buffer[bufferNum][n] = c;
+        n++;
+    }
 }
 
 // AUnit's putchar to store output characters in AUnit's buffers.

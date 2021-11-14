@@ -106,7 +106,7 @@ int main(void) {
         }
 
         PrintBuffer();
-        break;
+        // break;
     }
 
     PutS("bye!\n");

@@ -23,7 +23,7 @@ void PutX4(uint8_t n);
 void PutX8(uint8_t b);
 void PutX16(uint16_t w);
 
-// TO DELETE:
+// TESTING
 void PrintBuffer(void);
 
 #endif
