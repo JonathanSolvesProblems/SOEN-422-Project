@@ -49,13 +49,16 @@ void ResetBuffer(void) {
 }
 
 static void putBuffer(char c) {
-    buffer[n][bufferNum] = c;
+    buffer[bufferNum][n] = c;
+    n++;
     if (c == '\n')
-        if (bufferNum < 3)
+        if (bufferNum < 3) {
             bufferNum++;
+            n = 0;
+        }
         else {
             bufferNum = 0;
-            n++;
+            n = 0;
         }
 }
 
