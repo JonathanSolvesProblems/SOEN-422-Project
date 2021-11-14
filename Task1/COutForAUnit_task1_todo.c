@@ -42,16 +42,28 @@ void PrintBuffer(void) {
 }
 
 void ResetBuffer(void) {
+    for(int i = 0; i < nBuffers; i++) {
+        for(int j = 0; j < BufferMax; j++) {
+            buffer[i][j] = '\0';
+        }
+    }
+    /*
     for (n = 0; n < nBuffers; n++) {
         buffer[n][0] = '\0';
     }
-    n = 0;
+    n = 0;*/
+}
+
+bool StartsWith(const char* line, const char* with) {
+    int withLength = strlen(with);
+    return strncmp(line, with, withLength) == 0;
 }
 
 static void putBuffer(char c) {
     buffer[bufferNum][n] = c;
     n++;
-    if (c == '\n')
+
+    /*if (c == '\n')
         if (bufferNum < 3) {
             bufferNum++;
             n = 0;
@@ -59,7 +71,7 @@ static void putBuffer(char c) {
         else {
             bufferNum = 0;
             n = 0;
-        }
+        }*/
 }
 
 // AUnit's putchar to store output characters in AUnit's buffers.

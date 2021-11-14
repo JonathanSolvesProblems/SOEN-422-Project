@@ -49,6 +49,7 @@ char intToChar(uint8_t u8) {
     return (u8 + '0');
 }
 
+
 /*-------------------------------------------------------------------
  * main
  *-------------------------------------------------------------------*/
@@ -57,19 +58,25 @@ int main(void) {
 
     bool testRun = true;
 
-    PutS("Test AUnit on Arduino Nano v1.0\n");
+    /*PutS("Test AUnit on Arduino Nano v1.0\n");
     PutS("Usage: Enter <n> where n is the test number 1..");
-    PutX4(TestMax); PutS(" or '0' (zero) to quit.\n");
+    PutX4(TestMax); PutS(" or '0' (zero) to quit.\n");*/
 
     /*printf("Test AUnit on Arduino Nano v1.0\n");
     printf("Usage: Enter <n> where n is the test number 1..");
     printf("%d", TestMax); 
     printf(" or '0' (zero) to quit.\n");*/
 
+    uint8_t reading = 0;
+
     while (testRun) {
         PutS("$ ");
+
+        // ResetBuffer();
         // printf("$ ");
+        
         char cmd = GetC();
+
         uint8_t cmdInt = charToU8(cmd);
         
         if (cmd == '0') {
@@ -97,10 +104,13 @@ int main(void) {
             PutS("or \"0\" (zero) to quit.\n");
             // printf("Invalid test number. It should be 1..%d or \"0\" (zero) to quit.\n", TestMax);
         }
+
+        PrintBuffer();
+        break;
     }
 
     PutS("bye!\n");
-    PrintBuffer();
+    
     // printf("bye!\n");
     return 0;
 }
