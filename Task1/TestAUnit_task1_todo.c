@@ -9,6 +9,7 @@
 
 #if defined(Host)
     #include <stdio.h>
+    #include <stdlib.h>
 #endif
 
 static void Test1(void) {
@@ -41,6 +42,11 @@ static TestEntry tests[TestMax] = {
 //  Test9
 };
 
+// TODO: May have to change to uint8_t
+int charToInt(char c) {
+    return c - '0';
+}
+
 /*-------------------------------------------------------------------
  * main
  *-------------------------------------------------------------------*/
@@ -57,31 +63,30 @@ int main(void) {
     printf("Usage: Enter <n> where n is the test number 1..");
     printf("%d", TestMax); 
     printf(" or '0' (zero) to quit.\n");
-
-    uint8_t value;
+    
 
     while (testRun) {
         // PutS("$ ");
-        // char cmd = GetC();
         printf("$ ");
-
-        scanf("%d", &value);
-
-        if (value == 0) {
+        char cmd = GetC();
+        int cmdInt = charToInt(cmd);
+        // char cmd;
+        // scanf("%d", &cmd);
+        
+        if (cmd == '0') {
             break;
-        } else if (value == 1 || value == 2 || value == 3 || value == 4 || value == 5 || value == 6 || value == 7
-                    || value == 8 || value == 9) {
-            if (tests[value - 1] == NULL) {
-                printf("Test \"%d\" not referred.\n", value);
+        } else if (cmd == '1') {
+            if (tests[cmdInt - 1] == NULL) {
+                printf("Test \"%d\" not referred.\n", cmdInt);
             } else {
-                 tests[value - 1]();
+                 tests[cmdInt - 1]();
                  if(Equals()) {
                      printf(".\n");
                  } else {
                      printf("F\n");
                  }
             }
-        } else if (value > TestMax) {
+        } else if (cmd > TestMax) {
             printf("Invalid test number. It should be 1..%d or \"0\" (zero) to quit.\n", TestMax);
         }
 

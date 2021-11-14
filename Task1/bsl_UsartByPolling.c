@@ -15,16 +15,29 @@ static bool initialized = 0;
 
 #include <stdio.h>
 
+    static char character;
+
     char bsl_Uart_RxChar(void) {
-        puts("bsl_Uart_RxChar(void)");
+        scanf("%c", &character);
+
+        return character;
+        /*while (character == '\0');
+
+        char temp = character;
+        character = '\0';
+        return temp;*/
     }
 
     void bsl_Uart_TxChar(char c) { 
-        puts("bsl_Uart_TxChar(char c)");
+        /* while (character != '\0');
+
+        scanf("%c", &character);
+        character = c; */
     }
 
     void bsl_Uart_Init(void) {
-        puts(" bsl_Uart_Init(void)");
+        character = '\0';
+        // puts(" bsl_Uart_Init(void)");
     }
 
 #else
