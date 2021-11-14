@@ -49,7 +49,7 @@ char intToChar(uint8_t u8) {
     return (u8 + '0');
 }
 
-
+#define MaxLineSize (40)
 /*-------------------------------------------------------------------
  * main
  *-------------------------------------------------------------------*/
@@ -57,6 +57,8 @@ int main(void) {
     bsl_Uart_Init();
 
     bool testRun = true;
+
+    char lineInBuffer[MaxLineSize];
 
     /*PutS("Test AUnit on Arduino Nano v1.0\n");
     PutS("Usage: Enter <n> where n is the test number 1..");
@@ -70,46 +72,48 @@ int main(void) {
     uint8_t reading = 0;
 
     while (testRun) {
-        PutS("$ ");
+        // PutS("$ ");
 
         // ResetBuffer();
         // printf("$ ");
         
         char cmd = GetC();
+        // printf("HERE: %d", charToU8(cmd));
 
         uint8_t cmdInt = charToU8(cmd);
         
         if (cmd == '0') {
-            break;
+            break; // TODO: Will clean this up when it works.
         } else if (cmd == '1' || cmd == '2' || cmd == '3' || cmd == '4' || cmd == '5' || cmd == '6' || cmd == '7'
         || cmd == '8' || cmd == '9') {
             if (tests[cmdInt - 1] == NULL) {
                 PutS("Test \"");
-                PutS("cmd");
+                PutS(cmd + "");
                 PutS("\" not referred.\n");
                 // printf("Test \"%d\" not referred.\n", cmdInt);
             } else {
                  tests[cmdInt - 1]();
                  if(Equals()) {
-                     PutS(".\n");
+                     // printf("DEBUG: In Equals");
+                     // PutS(".\n");
                      // printf(".\n");
                  } else {
-                     PutS("F\n");
+                     // PutS("F\n");
                      // printf("F\n");
                  }
             }
-        } else if (cmd > TestMax) {
+        } else if (cmdInt > TestMax) {
             PutS("Invalid test number. It should be 1..");
-            PutS("TestMax");
+            PutS(intToChar(TestMax) + "");
             PutS("or \"0\" (zero) to quit.\n");
             // printf("Invalid test number. It should be 1..%d or \"0\" (zero) to quit.\n", TestMax);
         }
-
+        // printf("PRINTING...");
         PrintBuffer();
-        // break;
+        break;
     }
-
-    PutS("bye!\n");
+    
+    // PutS("bye!\n");
     
     // printf("bye!\n");
     return 0;

@@ -53,24 +53,26 @@ void PrintBuffer(void) {
 }
 
 void ResetBuffer(void) {
-    for (n = 0; n < nBuffers; n++) {
-        buffer[n][0] = '\0';
+    for (int i = 0; n < nBuffers; i++) {
+            buffer[i][0] = '\0';
     }
-    n = 0;
 }
-
-
 
 static void putBuffer(char c) {
     if (c == '\n') {
-        if (bufferNum < 3) {
+        // printf("\nTEST putBuffer \n: %s", buffer[bufferNum]);
+        if (bufferNum < 2) {
              bufferNum++;
-             n = 0; 
+             n = 0;
         } else {
+            // ResetBuffer();
             bufferNum = 0;
             n = 0;
         }
     } else {
+        /*if (c == '.') {
+            printf("dot detected, n is %d and bufferNum is %d", n, bufferNum);
+        }*/
         buffer[bufferNum][n] = c;
         n++;
     }
