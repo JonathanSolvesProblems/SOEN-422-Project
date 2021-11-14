@@ -24,8 +24,6 @@ static uint8_t  n = 0;
 static uint8_t  bufferNum = 0; // based on the newline detected.
 static bool     overflow = false;
 
-void _PutS(const char* s) { while (*s) bsl_Uart_TxChar(*s++); }
-
 // TESTING
 bool StartsWith(const char* line, const char* with) {
     int withLength = strlen(with);
@@ -72,6 +70,9 @@ static void putBuffer(char c) {
             n = 0;
         }
     } else {
+
+        
+
         buffer[bufferNum][n] = c;
         // printf("%c", buffer[bufferNum][n]);
         putchar(buffer[bufferNum][n]);

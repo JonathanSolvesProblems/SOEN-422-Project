@@ -30,7 +30,7 @@ static void Test2(void) {
 
 typedef void (*TestEntry)(void);
 
-#define TestMax  9  // Up to 9.
+#define TestMax  4  // Up to 9.
 
 static TestEntry tests[TestMax] = {
     Test1,
@@ -40,8 +40,6 @@ static TestEntry tests[TestMax] = {
 //  ...
 //  Test9
 };
-
-
 
 uint8_t charToU8(char c) {
     return (c - '0');
@@ -62,7 +60,8 @@ int main(void) {
 
     char temp[MaxLineSize][MaxLineSize];
 
-    /*PutS("Test AUnit on Arduino Nano v1.0\n");
+    // Test AUnit
+    /*PutS("AUnit on Arduino Nano v1.0\n");
     PutS("Usage: Enter <n> where n is the test number 1..");
     PutX4(TestMax); PutS(" or '0' (zero) to quit.\n");*/
 
@@ -84,7 +83,7 @@ int main(void) {
         // ResetBuffer();
         // printf("$ ");
         uint8_t cmd = GetC();
-        
+        // uint8_t cmd = getchar();
         
         // printf("HERE: %d", charToU8(cmd));
 
@@ -131,7 +130,7 @@ int main(void) {
         // PrintBuffer();
     } 
     
-    PutS("bye!\n");
+    // PutS("bye!\n");
     
     // printf("bye!\n");
     return 0;

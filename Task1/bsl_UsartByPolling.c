@@ -18,8 +18,8 @@ static bool initialized = 0;
     static char character;
 
     char bsl_Uart_RxChar(void) {
-        scanf("%c", &character);
-
+        scanf("%c", &character); // character = getchar(); 
+ 
         return character;
         
         /*while (character == '\0');
