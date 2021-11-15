@@ -48,15 +48,12 @@ char intToChar(uint8_t u8) {
 int main(void) {
     bsl_Uart_Init();
 
-    bool testRun = true;
-    char charTextMax = intToChar((uint8_t)TestMax);
+    uint8_t testRun = 1;
 
         // Test AUnit
     PutS("AUnit on Arduino Nano v1.0\n");
     PutS("Usage: Enter <n> where n is the test number 1..");
     PutX4(TestMax); PutS(" or '0' (zero) to quit.\n");
-
-    // TODO: Add delay, to give it time to initialize before user can enter input.
 
     uint8_t dollarChecker = 1;
 

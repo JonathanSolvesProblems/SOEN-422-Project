@@ -30,10 +30,7 @@ static bool initialized = 0;
     }
 
     void bsl_Uart_TxChar(char c) { 
-        /* while (character != '\0');
-
-        scanf("%c", &character);
-        character = c; */
+        // Intentionally left blank
     }
 
     void bsl_Uart_Init(void) {

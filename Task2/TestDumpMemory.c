@@ -26,7 +26,7 @@ int main(void) {
         };
     #endif
 
-    bool testRun = true;
+    uint8_t testRun = 1;
 
     while(testRun){
         // Initial msg
@@ -46,7 +46,7 @@ int main(void) {
 
         } else if(cmd == 'q'){
             PutS("\nBye!");
-            testRun = false;
+            testRun = 0;
         } else {
             PutS("\nInvalid command.");
         }
