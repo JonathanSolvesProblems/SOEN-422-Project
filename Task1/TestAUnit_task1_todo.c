@@ -61,9 +61,9 @@ int main(void) {
     char temp[MaxLineSize][MaxLineSize];
 
     // Test AUnit
-    /*PutS("AUnit on Arduino Nano v1.0\n");
+    PutS("AUnit on Arduino Nano v1.0\n");
     PutS("Usage: Enter <n> where n is the test number 1..");
-    PutX4(TestMax); PutS(" or '0' (zero) to quit.\n");*/
+    PutX4(TestMax); PutS(" or '0' (zero) to quit.\n");
 
     /*printf("Test AUnit on Arduino Nano v1.0\n");
     printf("Usage: Enter <n> where n is the test number 1..");
@@ -130,7 +130,7 @@ int main(void) {
         // PrintBuffer();
     } 
     
-    // PutS("bye!\n");
+    PutS("bye!\n");
     
     // printf("bye!\n");
     return 0;

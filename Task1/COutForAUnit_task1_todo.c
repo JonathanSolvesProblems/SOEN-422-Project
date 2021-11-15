@@ -51,9 +51,14 @@ void PrintBuffer(void) {
 }
 
 void ResetBuffer(void) {
-    for (int i = 0; i < nBuffers; i++) {
+    /*for (int i = 0; i < nBuffers; i++) {
             buffer[i][0] = '\0';
     }
+    n = 0;
+    bufferNum = 0;*/
+    memset(buffer, 0, sizeof(buffer) * n * bufferNum);
+    bufferNum = 0;
+    n = 0;
 }
 
 static void putBuffer(char c) {
@@ -70,6 +75,9 @@ static void putBuffer(char c) {
             n = 0;
         }
     } else {
+        if (c == 'T') {
+            ResetBuffer();
+        }
         buffer[bufferNum][n] = c;
         // printf("%c", buffer[bufferNum][n]);
         putchar(buffer[bufferNum][n]);
