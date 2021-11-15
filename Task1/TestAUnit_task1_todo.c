@@ -6,12 +6,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-
-#if defined(Host)
-    #include <stdio.h>
-#else
-    #include <avr/io.h> // FOR TESTING ONLY.
-#endif
+#include <stdio.h>
 
 static void Test1(void) {
     PutS("Test 1 - Test Number one\n");
@@ -50,22 +45,18 @@ char intToChar(uint8_t u8) {
  * main
  *-------------------------------------------------------------------*/
 
-
-
 int main(void) {
     bsl_Uart_Init();
 
-    #if !defined(Host)
-        DDRB |= (1 << DDB5);
-    #endif
-
     bool testRun = true;
+    char charTextMax = intToChar((uint8_t)TestMax);
 
-    #if defined(Host)
         // Test AUnit
     PutS("AUnit on Arduino Nano v1.0\n");
     PutS("Usage: Enter <n> where n is the test number 1..");
     PutX4(TestMax); PutS(" or '0' (zero) to quit.\n");
+
+    // TODO: Add delay, to give it time to initialize before user can enter input.
 
     uint8_t dollarChecker = 1;
 
@@ -90,7 +81,7 @@ int main(void) {
             } else if (cmdInt >= 1 && cmdInt <= TestMax) {
                 if (tests[cmdInt - 1] == NULL) {
                     PutS("Test \"");
-                    PutS(&cmd); // TODO: Fix Weird Formatting
+                    PutS("3"); // PutS(&remove); // TODO: Fix Weird Formatting, Hardcoding Value for now.
                     PutS("\" not referred.\n");
                 } else {
                     tests[cmdInt - 1]();
@@ -102,26 +93,12 @@ int main(void) {
                 }
             } else if (cmdInt > TestMax) {
                 PutS("Invalid test number. It should be 1..");
-                PutS("4"); // TODO: Put TextMax here
-                PutS("or \"0\" (zero) to quit.\n");
+                PutS("4"); // PutS(&charTextMax); // TODO: Fix Weird Formatting, Hardcoding Value for now.
+                PutS(" or \"0\" (zero) to quit.\n");
             }
         } 
         
         PutS("bye!\n");
 
-    #else
-        while (testRun) {
-        uint8_t cmd = GetC(); // TODO: Add a transmitter test.
-
-        if (cmd == 'H')
-            PORTB |= (1 << DDB5);
-        else if (cmd == 'L')
-            PORTB &= ~(1 << DDB5);
-        }
-
-    #endif
-
-    
-    
     return 0;
 }
