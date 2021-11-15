@@ -33,8 +33,10 @@ int main(void) {
         PutS("Shell Nano v1.0\nUsage: type 'm'(memory) and 'q' to quit.\n");
 
         // Get Input
+        PutC('$');
         char cmd = GetC();
-        
+        PutC(cmd);
+
         if(cmd == 'm'){
             #if !defined(Host)
                 DumpMemory((uint8_t*)0, 32); // 32 registers on Nano.
@@ -43,10 +45,10 @@ int main(void) {
             #endif
 
         } else if(cmd == 'q'){
-            PutS("Bye!");
+            PutS("\nBye!");
             testRun = false;
         } else {
-            PutS("Invalid command.");
+            PutS("\nInvalid command.");
         }
         PutN();
         PutN();
