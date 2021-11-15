@@ -9,23 +9,19 @@
 
 #if defined(Host)
     #include <stdio.h>
+#else
+    #include <avr/io.h> // FOR TESTING ONLY.
 #endif
 
 static void Test1(void) {
     PutS("Test 1 - Test Number one\n");
     PutS("1\n"); // Expected output
     PutS("1\n"); // Current output
-    /*printf("Test 1 - Test Number one\n");
-    printf("1\n"); // Expected output
-    printf("1\n"); // Current output*/
 }
 static void Test2(void) {
     PutS("Test 2 - Test Number two\n");
     PutS("23\n"); // Expected output
     PutS("24\n"); // Current output
-    /*printf("Test 2 - Test Number two\n");
-    printf("23\n"); // Expected output
-    printf("24\n"); // Current output*/
 }
 
 typedef void (*TestEntry)(void);
@@ -53,85 +49,79 @@ char intToChar(uint8_t u8) {
 /*-------------------------------------------------------------------
  * main
  *-------------------------------------------------------------------*/
+
+
+
 int main(void) {
     bsl_Uart_Init();
 
+    #if !defined(Host)
+        DDRB |= (1 << DDB5);
+    #endif
+
     bool testRun = true;
 
-    char temp[MaxLineSize][MaxLineSize];
-
-    // Test AUnit
+    #if defined(Host)
+        // Test AUnit
     PutS("AUnit on Arduino Nano v1.0\n");
     PutS("Usage: Enter <n> where n is the test number 1..");
     PutX4(TestMax); PutS(" or '0' (zero) to quit.\n");
 
-    /*printf("Test AUnit on Arduino Nano v1.0\n");
-    printf("Usage: Enter <n> where n is the test number 1..");
-    printf("%d", TestMax); 
-    printf(" or '0' (zero) to quit.\n");*/
-    
     uint8_t dollarChecker = 1;
 
-    while (testRun) {
-        if (dollarChecker) {
-            PutS("$ ");
-            dollarChecker = 0;
-        } else {
-            dollarChecker = 1;
-        }
-
-        // ResetBuffer();
-        // printf("$ ");
-        uint8_t cmd = GetC();
-        // uint8_t cmd = getchar();
-        
-        // printf("HERE: %d", charToU8(cmd));
-
-        int cmdInt = charToU8(cmd);
-
-        if (cmdInt == 218) {
-            // PutS("\n");
-            continue;
-        }
-        
-        // printf("%d", cmdInt);
-        
-        if (cmd == '0') {
-            // printf("HERE");
-            break; // TODO: Will clean this up when it works.
-        } else if (cmdInt >= 1 && cmdInt <= TestMax) {
-            if (tests[cmdInt - 1] == NULL) {
-                PutS("Test \"");
-                // PutS(cmd + "");
-                PutS(&cmd);
-                PutS("\" not referred.\n");
-                // printf("Test \"%d\" not referred.\n", cmdInt);
+        while (testRun) {
+            if (dollarChecker) {
+                PutS("$ ");
+                dollarChecker = 0;
             } else {
-                 // printf("HERE");
-                 tests[cmdInt - 1]();
-                 if(Equals()) {
-                     // printf("DEBUG: In Equals");
-                     PutS(".\n");
-                     // printf(".\n");
-                 } else {
-                     PutS("F\n");
-                     // printf("F\n");
-                 }
+                dollarChecker = 1;
             }
-        } else if (cmdInt > TestMax) {
-            // printf("HERE");
-            PutS("Invalid test number. It should be 1..");
-            // PutS(intToChar(TestMax) + "");
-            // PutS(TestMax);
-            PutS("or \"0\" (zero) to quit.\n");
-            // printf("Invalid test number. It should be 1..%d or \"0\" (zero) to quit.\n", TestMax);
+
+            uint8_t cmd = GetC();
+
+            int cmdInt = charToU8(cmd);
+
+            if (cmdInt == 218) {
+                continue;
+            }
+            
+            if (cmd == '0') {
+                break; 
+            } else if (cmdInt >= 1 && cmdInt <= TestMax) {
+                if (tests[cmdInt - 1] == NULL) {
+                    PutS("Test \"");
+                    PutS(&cmd); // TODO: Fix Weird Formatting
+                    PutS("\" not referred.\n");
+                } else {
+                    tests[cmdInt - 1]();
+                    if(Equals()) {
+                        PutS(".\n");
+                    } else {
+                        PutS("F\n");
+                    }
+                }
+            } else if (cmdInt > TestMax) {
+                PutS("Invalid test number. It should be 1..");
+                PutS("4"); // TODO: Put TextMax here
+                PutS("or \"0\" (zero) to quit.\n");
+            }
+        } 
+        
+        PutS("bye!\n");
+
+    #else
+        while (testRun) {
+        uint8_t cmd = GetC(); // TODO: Add a transmitter test.
+
+        if (cmd == 'H')
+            PORTB |= (1 << DDB5);
+        else if (cmd == 'L')
+            PORTB &= ~(1 << DDB5);
         }
-        // printf("PRINTING...");
-        // PrintBuffer();
-    } 
+
+    #endif
+
     
-    PutS("bye!\n");
     
-    // printf("bye!\n");
     return 0;
 }
