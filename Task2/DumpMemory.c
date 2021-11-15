@@ -13,6 +13,8 @@ void DumpMemory(uint8_t* from, uint16_t nBytes){
             PutC('\t');
         }
     }
+    PutX8((uint8_t) from[n]);
+    PutC('\t');
 
     #endif
 
