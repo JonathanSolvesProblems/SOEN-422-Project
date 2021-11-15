@@ -5,10 +5,7 @@
 */
 
 #include "DumpMemory.h"
-
-#if !defined(Host)
 #include "../Task1/bsl_Uart.h"
-#endif
 
 /*-------------------------------------------------------------------
  * main
@@ -36,6 +33,7 @@ int main(void) {
         PutC('$');
         char cmd = GetC();
         PutC(cmd);
+        PutN();
 
         if(cmd == 'm'){
             #if !defined(Host)
@@ -45,10 +43,10 @@ int main(void) {
             #endif
 
         } else if(cmd == 'q'){
-            PutS("\nBye!");
+            PutS("Bye!");
             testRun = 0;
         } else {
-            PutS("\nInvalid command.");
+            PutS("Invalid command.");
         }
         PutN();
         PutN();

@@ -1,1 +1,3 @@
-gcc DumpMemory.c ../Task1/COutForAUnit_task1_todo.c ../Task1/bsl_UsartByPolling.c TestDumpMemory.c -D Host
+gcc DumpMemory.c TestDumpMemory.c ../Task1/bsl_UsartByPolling.c ../Task1/COutForAUnit_task1_todo.c -D Host -o Task2
+Task2.exe
+pause
