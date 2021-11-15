@@ -8,6 +8,7 @@
 #define __DumpMemory_h
 
 #include <stdint.h>
+#include "../Task1/COutForAUnit.h"
 
 void DumpMemory(uint8_t* from, uint16_t nBytes);
 
