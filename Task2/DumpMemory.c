@@ -1,8 +1,6 @@
 #include "DumpMemory.h"
+#include "../Task1/COutForAUnit.h"
 #include <stdint.h>
-
-void PutC(char c)        { __putchar(c); }
-void PutS(const char* s) { while (*s) if (s != NULL) PutC(*s++); }
 
 void DumpMemory(uint8_t* from, uint16_t nBytes){
     #if !defined(Host)
