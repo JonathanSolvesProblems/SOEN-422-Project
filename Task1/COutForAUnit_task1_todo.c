@@ -33,57 +33,58 @@ bool StartsWith(const char* line, const char* with) {
 bool Equals(void) {
     if (overflow) return false; // TODO: Add message if overflowed?
 
-    // printf("Buffer 0: %s\n", buffer[0]);
-    // printf("Buffer 1: %s\n", buffer[1]);
-    // printf("Buffer 2: %s\n", buffer[2]);
-
     // Comparing expected and current outputs.
     return strcmp(buffer[1], buffer[2]) == 0;
 }
 
-void PrintBuffer(void) {
-    for(int i = 0; i < nBuffers; i++) {
-        //for(int j = 0; j < BufferMax; j++) {
-            printf("%s\n", buffer[i]);
-        //}
-        // printf("");
-    }
-}
-
 void ResetBuffer(void) {
-    /*for (int i = 0; i < nBuffers; i++) {
-            buffer[i][0] = '\0';
-    }
-    n = 0;
-    bufferNum = 0;*/
     memset(buffer, 0, sizeof(buffer) * n * bufferNum);
     bufferNum = 0;
     n = 0;
 }
 
-static void putBuffer(char c) {
-    if (c == '\n') {
-        // printf("\nTEST putBuffer \n: %s", buffer[bufferNum]);
-        if (bufferNum < 2) {
-             bufferNum++;
-             putchar('\n');
-             n = 0;
+#if defined(Host)
+    static void putBuffer(char c) {
+        if (c == '\n') {
+            if (bufferNum < 2) {
+                bufferNum++;
+                putchar('\n');
+                n = 0;
+            } else {
+                putchar('\n');
+                bufferNum = 0;
+                n = 0;
+            }
         } else {
-            // ResetBuffer();
-            putchar('\n');
-            bufferNum = 0;
-            n = 0;
+            if (c == 'T') {
+                ResetBuffer();
+            }
+            buffer[bufferNum][n] = c;
+            putchar(buffer[bufferNum][n]);
+            n++;
         }
-    } else {
-        if (c == 'T') {
-            ResetBuffer();
-        }
-        buffer[bufferNum][n] = c;
-        // printf("%c", buffer[bufferNum][n]);
-        putchar(buffer[bufferNum][n]);
-        n++;
     }
-}
+#else
+    static void putBuffer(char c) {
+        if (c == '\n') {
+            if (bufferNum < 2) {
+                bufferNum++;
+                n = 0;
+            } else {
+                bufferNum = 0;
+                n = 0;
+            }
+        } else {
+            if (c == 'T') {
+                ResetBuffer();
+            }
+            buffer[bufferNum][n] = c;
+            n++;
+        }
+    }
+#endif
+
+
 
 // AUnit's putchar to store output characters in AUnit's buffers.
 static void __putchar(char c) {
