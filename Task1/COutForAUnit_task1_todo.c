@@ -75,7 +75,7 @@ void ResetBuffer(void) {
                 n = 0;
             }
         } else {
-            if (c == 'T') {
+            if (bufferNum == 0 && c == 'T') {
                 ResetBuffer();
             }
             buffer[bufferNum][n] = c;

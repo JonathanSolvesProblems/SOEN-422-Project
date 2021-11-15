@@ -78,7 +78,7 @@ int main(void) {
             } else if (cmdInt >= 1 && cmdInt <= TestMax) {
                 if (tests[cmdInt - 1] == NULL) {
                     PutS("Test \"");
-                    PutS("3"); // PutS(&remove); // TODO: Fix Weird Formatting, Hardcoding Value for now.
+                    PutC(cmd);
                     PutS("\" not referred.\n");
                 } else {
                     tests[cmdInt - 1]();
@@ -90,7 +90,7 @@ int main(void) {
                 }
             } else if (cmdInt > TestMax) {
                 PutS("Invalid test number. It should be 1..");
-                PutS("4"); // PutS(&charTextMax); // TODO: Fix Weird Formatting, Hardcoding Value for now.
+                PutC(intToChar(TestMax));
                 PutS(" or \"0\" (zero) to quit.\n");
             }
         } 
