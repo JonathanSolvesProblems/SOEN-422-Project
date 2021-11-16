@@ -5,8 +5,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>   // string
-#include <iostream> //iostream
-#include <fstream>  //fstream
+#include "../Task1/COutForAUnit.h"
 
 #define MaxCharactersInLine 256
 #define MaxCharPerLine 9
@@ -180,6 +179,8 @@ public:
         char line[10];
         int code;
 
+        // TODO: Your code...
+
         while (fgets(line, sizeof(line), input) != NULL) {
             code = atoi(line);
             if (code == -1)
@@ -189,20 +190,15 @@ public:
             i++;
         }
 
-        // read until -1
-        // store in line and code.
-        // memory[i] = code;
-
-        // TODO: Your code...
-
-        // TODO:
-        // read file of integers. Check condition where if it equals -1, then know reached out of file.
-        // store integer into array line.
+        
 
         // Use a factory to isolate the configuration. In Lecture 6.
 
         fclose(input);
         //t        printf("\n%d words loaded.\n", i - pe);
+        /* PutC((i - pe) + '0');
+        PutS("words loaded.");
+        PutC('\n'); */
     }
 
     void run()
