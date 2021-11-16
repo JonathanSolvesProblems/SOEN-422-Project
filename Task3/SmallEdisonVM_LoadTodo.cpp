@@ -169,6 +169,19 @@ public:
         char line[10];
         int code;
 
+        while (fgets(line, sizeof(line), input) != NULL) {
+            code = atoi(line);
+            if (code == -1)
+                break;
+            // printf("%d\n", code);
+            memory[i] = code;
+            i++;
+        }
+
+        // read until -1
+        // store in line and code.
+        // memory[i] = code;
+
         // TODO: Your code...
 
         // TODO:
