@@ -4,7 +4,7 @@
 #include <stdlib.h> // exit, EXIT_FAILURE
 #include <stdio.h>
 #include <stdint.h>
-#include <string>   // string
+#include <string.h>   // string
 #include <iostream> //iostream
 #include <fstream>  //fstream
 
