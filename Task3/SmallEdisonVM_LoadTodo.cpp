@@ -169,7 +169,15 @@ public:
         char line[10];
         int code;
 
-        // Your code...
+        // TODO: Your code...
+
+        // TODO:
+        // read file of integers. Check condition where if it equals -1, then know reached out of file.
+        // store integer into array line.
+
+        // Use a factory to isolate the configuration. In Lecture 6.
+
+        
 
         fclose(input);
 //t        printf("\n%d words loaded.\n", i - pe);
