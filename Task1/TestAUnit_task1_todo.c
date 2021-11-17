@@ -8,6 +8,8 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#define CharEnd (218)
+
 static void Test1(void) {
     PutS("Test 1 - Test Number one\n");
     PutS("1\n"); // Expected output
@@ -69,7 +71,7 @@ int main(void) {
 
             int cmdInt = charToU8(cmd);
 
-            if (cmdInt == 218) {
+            if (cmdInt == CharEnd) { // Necessary on Host, can disable if have no new line on serial 
                 continue;
             }
             
