@@ -196,9 +196,9 @@ public:
 
         fclose(input);
         //t        printf("\n%d words loaded.\n", i - pe);
-        /* PutC((i - pe) + '0');
+        PutC((i - pe) + '0');
         PutS("words loaded.");
-        PutC('\n'); */
+        PutC('\n');
     }
 
     void run()
@@ -1285,7 +1285,12 @@ private:
     }
     void PutCharacter()
     {
-        printf("%c", (char)memory[sp]);
+        // #if defined(Host)
+            printf("%c", (char)memory[sp]);
+        // #else
+        //     PutC((char)memory[sp]);
+        // #endif
+        
         sp = sp - 1;
     }
     void PutBoolean()
