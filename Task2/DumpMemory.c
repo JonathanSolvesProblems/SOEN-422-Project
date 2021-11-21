@@ -6,11 +6,12 @@ void DumpMemory(uint8_t* from, uint16_t nBytes){
         if(n%16 == 0){ // at the start of each register
             if(n == 16)
                 PutN(); // indent between first and second register
-            PutX16((uint16_t) n);
+            PutX16((uint16_t) from);
             PutC(' ');
         }
         // TODO: Implement offset.
-        PutX8((uint8_t) from[n]);
+        // PutX8((uint8_t) from[n]);
+        PutX8(*from++);
         PutC(' ');
     }
     PutN();

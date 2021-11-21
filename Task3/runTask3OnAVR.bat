@@ -1,4 +1,4 @@
-g++ SmallEdisonVM_LoadTodo.cpp ../Task1/COutForAUnit_task1_todo.c ../Task1/bsl_UsartByPolling.c -D Host -o Task3
-Task3.exe picFiles/f0.pic
+avr-gcc -Os -Wall -DF_CPU=16000000UL -mmcu=atmega328p hal_kernel.c hal_task.c testKernel.c ../Task1/COutForAUnit_task1_todo.c ../Task1/bsl_UsartByPolling.c ../Shared/shared.c -o task3OnMicro.o
+avr-objcopy -O ihex -j .text -j .data task3OnMicro.o task3OnMicro.hex
+avrdude -c arduino -p atmega328p -b 57600 -P COM3 -D -Uflash:w:task3OnMicro.hex:i
 pause
-

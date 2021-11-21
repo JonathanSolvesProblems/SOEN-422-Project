@@ -6,7 +6,17 @@
 struct TaskDesc; // Forward reference
 typedef struct TaskDesc* Task; // Opaque type
 
-Task Task_New();
-Task Task_New(uint8_t size);
+Task createTask(uint16_t size);
+Task **createDoubleArrayTask(uint16_t size);
+
+uint16_t GetBp(Task t);
+uint16_t GetSp(Task t);
+uint16_t GetPe(Task t);
+uint16_t GetIp(Task t);
+
+void SetBp(Task t, uint16_t value);
+void SetSp(Task t, uint16_t value);
+void SetPe(Task t, uint16_t value);
+void SetIp(Task t, uint16_t value);
 
 #endif
