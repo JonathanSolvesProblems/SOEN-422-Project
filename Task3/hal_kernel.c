@@ -983,8 +983,8 @@ void PutInteger(Kernel kInstance)
     #if defined(Host)
         printf("%d", kInstance->memory[kInstance->sp]);
     #else
-        // PutS("PutInteger");
-        // PutC(intToChar(kInstance->memory[kInstance->sp]));
+        PutS("PutInteger");
+        PutC(intToChar(kInstance->memory[kInstance->sp]));
     #endif
     
     kInstance->sp = kInstance->sp - 1;
@@ -995,9 +995,9 @@ void PutCharacter(Kernel kInstance)
         printf("%c", (char)kInstance->memory[kInstance->sp]);
     #else
         
-        // PutS("PutCharacter");
-        // PutN();
-        // PutC(intToChar(kInstance->memory[kInstance->sp]));
+        PutS("PutCharacter");
+        PutN();
+        PutC(intToChar(kInstance->memory[kInstance->sp]));
     #endif
          
     kInstance->sp = kInstance->sp - 1;
@@ -1081,27 +1081,14 @@ void load(Kernel kInstance, FILE *input)
 void load(Kernel kInstance, int16_t input[]){
     uint16_t i = kInstance->ip = kInstance->pe;
     int16_t code;
-    // int16_t combine = sizeof(input) * sizeof(int16_t);
-    // PutC(intToChar(combine));
-    // PutN();
-
-    // for(int j = 0; j < 40; j++){
-    //     if (input[i] == -1) 
-    //          break;
-    //     // PutC(code);
-    //     PutX16(input[j]);
-    //     PutN();
-
-    //     kInstance->memory[j] = input[j];
-    // }
 
     for(i = 0; i < loadLength; i++){
         if (input[i] == -1) 
              break;
         code = input[i];
         // PutC(code);
-        PutX16(code);
-        PutN();
+        // PutX16(code);
+        // PutN();
         kInstance->memory[i] = code;
     }
 
@@ -1119,20 +1106,24 @@ void run(Kernel kInstance) {
     int16_t opcode = 0;
     while (1)
     {
-        // printf("%d\n", kInstance->memory[kInstance->ip++] - INSTR_TABLE);
         //t            printf("ip=%02x opcode=%d", (ip-1024), opcode));
-        // printf("MEOW %d", kInstance->memory[kInstance->ip++] - INSTR_TABLE);
-        
-        opcode = (kInstance->memory[kInstance->ip] - INSTR_TABLE);
-        kInstance->ip = kInstance->ip + 1;
+
+        PutX16(kInstance->ip);
+        PutN();
 
         #if defined(Host)
-            printf("OPCODE: %d\n", opcode);
+            opcode = (kInstance->memory[kInstance->ip++] - INSTR_TABLE);
         #else
-            PutS("Check Op Code");
-            PutX16(opcode);
-            PutN();
+            opcode = (kInstance->memory[(kInstance->ip++) - 1024] - INSTR_TABLE);
         #endif
+        // kInstance->ip = kInstance->ip + 1;
+
+        PutS("OpCode");
+        PutN();
+        PutX16(opcode);
+        PutN();
+        PutX16(kInstance->ip);
+        PutN();
 
         switch (opcode)
         {
