@@ -1,11 +1,9 @@
 // hal_TestLoader.c - Test Loader implementation for HAL using bsl_Uart.c
 
-#include "bsl_Uart.h"
+#include "../Task1/bsl_Uart.h"
 #include "hal_Loader.h"
-#include "vm.h"
-
-hi jeffrey :) 
-...
+#include "../Task3/bsl_vm.h"
+#include <stdbool.h>
 
 #define Target      "(ATMega328P)"
 #define VMName      "Small Edison Virtual Machine "
