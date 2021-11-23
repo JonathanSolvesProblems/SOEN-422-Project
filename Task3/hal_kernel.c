@@ -3,96 +3,7 @@
 #include <stdbool.h>
 #include "../Task1/COutForAUnit.h"
 #include <stdlib.h>
-
-#define INVALID -1
-#define ADD 0
-#define ALSO 1
-#define AND 2
-#define ASSIGN 3
-#define BLANK 4
-#define COBEGIN 5
-#define CONSTANT 6
-#define CONSTRUCT 7
-//  #define DIFFERENCE 8
-#define DIVIDE 9
-#define DO 10
-#define ELSE 11
-#define ENDCODE 12
-#define ENDIF 13
-#define ENDLIB 14
-#define ENDPROC 15
-#define ENDWHEN 16
-#define EQUAL 17
-#define ERROR 18
-#define FIELD 19
-//  #define FUNCVAL 20
-#define GOTO 21
-#define GREATER 22
-//  #define IN 23
-#define INDEX 24
-#define INSTANCE 25
-//  #define INTERSECTION 26
-#define LESS 27
-#define LIBPROC 28
-#define MINUS 29
-#define MODULO 30
-#define MULTIPLY 31
-#define NEWLINE 32
-#define NOT 33
-#define NOTEQUAL 34
-#define NOTGREATER 35
-#define NOTLESS 36
-#define OR 37
-#define PARAMARG 38
-#define PARAMCALL 39
-#define PARAMETER 40
-#define PROCARG 41
-#define PROCCALL 42
-#define PROCEDURE 43
-#define PROCESS 44
-#define SUBTRACT 45
-//  #define UNION 46
-#define VALSPACE 47
-#define VALUE 48
-#define VARIABLE 49
-#define WAIT 50
-#define WHEN 51
-#define WHILE 52
-#define ADDR 53
-#define HALT 54
-#define OBTAIN 55
-#define PLACE 56
-#define SENSE 57
-/** Extra */
-#define ELEMASSIGN 58
-#define ELEMVALUE 59
-#define LOCALCASE 60
-#define LOCALSET 61
-#define LOCALVALUE 62
-#define LOCALVAR 63
-#define OUTERCALL 64
-#define OUTERCASE 65
-#define OUTERPARAM 66
-#define OUTERSET 67
-#define OUTERVALUE 68
-#define OUTERVAR 69
-#define SETCONST 70
-#define SINGLETON 71
-#define STRINGCONST 72
-
-#define PUTI 73
-#define PUTC 74
-#define PUTB 75
-#define PUTN 76
-
-#define MAX_KERNEL_STACK_SIZE 100
-#define MAX_QUEUE 10
-#define MIN_ADDRESS 0
-#define MAX_ADDRESS 20000 // 1024
-#define SPACE (int)(' ')
-#define INSTR_TABLE 400
-#define SET_LENGTH 0x8
-#define SET_LIMIT 127
+#include "private_kernel_variables.h"
 
 typedef struct KernelDesc {
     
@@ -1072,8 +983,8 @@ void PutInteger(Kernel kInstance)
     #if defined(Host)
         printf("%d", kInstance->memory[kInstance->sp]);
     #else
-        PutS("PutInteger");
-        PutC(intToChar(kInstance->memory[kInstance->sp]));
+        // PutS("PutInteger");
+        // PutC(intToChar(kInstance->memory[kInstance->sp]));
     #endif
     
     kInstance->sp = kInstance->sp - 1;
@@ -1083,9 +994,10 @@ void PutCharacter(Kernel kInstance)
     #if defined(Host)
         printf("%c", (char)kInstance->memory[kInstance->sp]);
     #else
-        PutS("PutCharacter");
-        PutN();
-        PutC(intToChar(kInstance->memory[kInstance->sp]));
+        
+        // PutS("PutCharacter");
+        // PutN();
+        // PutC(intToChar(kInstance->memory[kInstance->sp]));
     #endif
          
     kInstance->sp = kInstance->sp - 1;
@@ -1160,10 +1072,12 @@ void load(Kernel kInstance, FILE *input)
 
     fclose(input);
     //t        printf("\n%d words loaded.\n", i - pe);
-    PutC((char)(i - kInstance->pe));
-    PutS(" words loaded.\n");
+    // PutC((char)(i - kInstance->pe));
+    // PutS(" words loaded.\n");
 }
 #else
+
+#define loadLength (50)
 void load(Kernel kInstance, int16_t input[]){
     uint16_t i = kInstance->ip = kInstance->pe;
     int16_t code;
@@ -1171,13 +1085,23 @@ void load(Kernel kInstance, int16_t input[]){
     // PutC(intToChar(combine));
     // PutN();
 
-    for(i = 0; i < 38; i++){
+    // for(int j = 0; j < 40; j++){
+    //     if (input[i] == -1) 
+    //          break;
+    //     // PutC(code);
+    //     PutX16(input[j]);
+    //     PutN();
+
+    //     kInstance->memory[j] = input[j];
+    // }
+
+    for(i = 0; i < loadLength; i++){
+        if (input[i] == -1) 
+             break;
         code = input[i];
         // PutC(code);
         PutX16(code);
         PutN();
-        if (code == -1) 
-             break;
         kInstance->memory[i] = code;
     }
 
@@ -1198,28 +1122,44 @@ void run(Kernel kInstance) {
         // printf("%d\n", kInstance->memory[kInstance->ip++] - INSTR_TABLE);
         //t            printf("ip=%02x opcode=%d", (ip-1024), opcode));
         // printf("MEOW %d", kInstance->memory[kInstance->ip++] - INSTR_TABLE);
-        opcode = (kInstance->memory[kInstance->ip++] - INSTR_TABLE);
+        
+        opcode = (kInstance->memory[kInstance->ip] - INSTR_TABLE);
+        kInstance->ip = kInstance->ip + 1;
+
+        #if defined(Host)
+            printf("OPCODE: %d\n", opcode);
+        #else
+            PutS("Check Op Code");
+            PutX16(opcode);
+            PutN();
+        #endif
+
         switch (opcode)
         {
         case ENDPROC:
             // printf("ENDPROC\n");
+            PutS("ENDPROC");
             EndProc(kInstance);
             break;
         case PROCEDURE:
             // printf("PROCEDURE\n");
+            PutS("PROCEDURE\n");
             Procedure(kInstance);
             break;
         case INDEX:
             // printf("INDEX\n");
+            PutS("INDEX\n");
             Index(kInstance);
             break;
         case COBEGIN:
             // printf("COBEGIN\n");
+            PutS("COBEGIN\n");
             Cobegin(kInstance);
             break;
             //          case LIBPROC:           Libproc();     break;
         case PARAMCALL:
             // printf("PARAMCALL\n");    
+            PutS("PARAMCALL\n");  
             ParamCall(kInstance);
             break;
         case PROCCALL:
@@ -1228,10 +1168,12 @@ void run(Kernel kInstance) {
             break;
         case ALSO:
             // printf("ENDPROC\n");  
+            PutS("ENDPROC\n");  
             Also(kInstance);
             break;
         case ELSE:
             // printf("ELSE\n");  
+            PutS("ELSE\n");
             Else(kInstance);
             break;
             //          case ENDLIB:            Endlib();      break;
@@ -1240,85 +1182,105 @@ void run(Kernel kInstance) {
             //          case PARAMETER:         Parameter();   break;
         case PROCARG:
             // printf("PROCARG\n");  
+            PutS("PROCARG\n");  
             ProcArg(kInstance);
             break;
         case PROCESS:
             // printf("PROCESS\n");  
+            PutS("PROCESS\n");  
             Process(kInstance);
             break;
         case VARIABLE:
             // printf("VARIABLE\n");  
+            PutS("VARIABLE\n"); 
             Variable(kInstance);
             break;
         case ASSIGN:
             // printf("ASSIGN\n");    
+            PutS("ASSIGN\n");    
             Assign(kInstance);
             break;
             //          case BLANK:             Blank();       break;
         case CONSTANT:
             // printf("CONSTANT\n");  
+            PutS("CONSTANT\n");  
             Constant(kInstance);
             break;
         case CONSTRUCT:
             // printf("CONSTRUCT\n");  
+            PutS("CONSTRUCT\n"); 
             Construct(kInstance);
             break;
         case DO:
             // printf("DO\n");  
+            PutS("DO\n"); 
             Do(kInstance);
             break;
             //          case ENDIF:             EndIf();       break;
         case ENDWHEN:
-            // printf("ENDWHEN\n");  
+            // printf("ENDWHEN\n"); 
+            PutS("ENDWHEN\n");  
             EndWhen(kInstance);
             break;
         case EQUAL:
             // printf("EQUAL\n");  
+            PutS("EQUAL\n"); 
             Equal(kInstance);
             break;
         case FIELD:
-            // printf("FIELD\n");  
+            // printf("FIELD\n"); 
+            PutS("FIELD\n");   
             Field(kInstance);
             break;
         case GOTO:
-            // printf("GOTO\n");  
+            // printf("GOTO\n");
+            PutS("GOTO\n");  
             Goto(kInstance);
             break;
         case NOTEQUAL:
-            // printf("ENDPROC\n");  
+            // printf("ENDPROC\n"); 
+            PutS("ENDPROC\n");  
             NotEqual(kInstance);
             break;
         case VALSPACE:
-            // printf("VALSPACE\n");  
+            // printf("VALSPACE\n"); 
+            PutS("VALSPACE\n");   
             ValSpace(kInstance);
             break;
         case VALUE:
             // printf("VALUE\n");  
+            PutS("VALUE\n"); 
             Value(kInstance);
             break;
         case WAIT:
-            // printf("WAIT\n");  
+            // printf("WAIT\n");
+            PutS("WAIT\n");  
             Wait(kInstance);
             break;
         case WHEN:
             // printf("WHEN\n");  
+            PutS("WHEN\n");
             When(kInstance);
             break;
             //          case ERROR:             Error();       break;
         case ADD:
             // printf("ADD\n");  
+            PutS("ADD\n");
             Add(kInstance);
             break;
         case AND:
-            // printf("AND\n");  
+            // printf("AND\n"); 
+            PutS("AND\n"); 
             And(kInstance);
             break;
         case DIVIDE:
             // printf("DIVIDE\n");  
+            PutS("DIVIDE\n");  
             Div(kInstance);
             break;
         case ENDCODE:
             // printf("ENDCODE\n");  
+            PutS("ENDCODE\n");  
             EndCode(kInstance);
             break;
         case GREATER:
@@ -1327,38 +1289,47 @@ void run(Kernel kInstance) {
             break;
         case LESS:
             // printf("LESS\n");
+            PutS("LESS\n");
             TestForLessThan(kInstance);
             break;
         case MINUS:
             // printf("MINUS\n");
+            PutS("MINUS\n");
             Neg(kInstance);
             break;
         case MODULO:
             // printf("MODULO\n");
+            PutS("MODULO\n");
             Mod(kInstance);
             break;
         case MULTIPLY:
             // printf("MULTIPLY\n");
+            PutS("MULTIPLY\n");
             Mul(kInstance);
             break;
         case NOT:
             // printf("NOT\n");
+            PutS("NOT\n");
             Not(kInstance);
             break;
         case NOTGREATER:
             // printf("NOTGREATER\n");
+            PutS("NOTGREATER\n");
             TestForLessOrEqual(kInstance);
             break;
         case NOTLESS:
             // printf("NOTLESS\n");
+            PutS("NOTLESS\n");
             TestForGreaterOrEqual(kInstance);
             break;
         case OR:
             // printf("OR\n");
+            PutS("OR\n");
             Or(kInstance);
             break;
         case SUBTRACT:
             // printf("SUBTRACT\n");
+            PutS("SUBTRACT\n");
             Subtract(kInstance);
             break;
             //          case ADDR:              Addr();        break;
@@ -1368,27 +1339,33 @@ void run(Kernel kInstance) {
             //          case SENSE:             Sense();       break;
         case INSTANCE:
             // printf("INSTANCE\n");
+            PutS("INSTANCE\n");
             Instance(kInstance);
             break;
         case PUTI:
             // printf("PUTI\n");
+            PutS("PUTI\n");
             PutInteger(kInstance);
             break;
         case PUTC:
             // printf("PUTC\n");
+            PutS("Here");
             PutCharacter(kInstance);
             break;
         case PUTB:
             // printf("PUTB\n");
+            PutS("PUTB\n");
             PutBoolean(kInstance);
             break;
         case PUTN:
             // printf("PUTN\n");
+            PutS("PUTN\n");
             PutLine(kInstance);
             break;
         default:
             // printf("Unknown opcode=%d ip=%u\n", opcode, kInstance->ip);
             // printf("Can't say gamer without GayYEEEE!!!!");
+            PutS("Default\n");
             exit(1);
         }
     }
