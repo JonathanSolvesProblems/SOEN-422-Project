@@ -10,7 +10,7 @@
 #define MIN_ADDRESS 0
 #define MAX_ADDRESS 4095  // 20000
 #define SPACE (int)(' ')
-#define INSTR_TABLE 400
+#define INSTR_TABLE (int16_t)400
 #define SET_LENGTH 0x8
 #define SET_LIMIT 127
 
@@ -49,7 +49,7 @@ typedef struct KernelDesc {
     // const int SET_LENGTH = 0x8;
     // const int SET_LIMIT = 127;
 
-    uint16_t *memory;
+    int16_t *memory;
     uint8_t lineNo;
 } KernelDesc;
 
@@ -1042,12 +1042,12 @@ Kernel createKernel(uint16_t size) { // TODO: Init to clean up.
         kInstance->taskQueue[i] = (Task*)createTask(MAX_QUEUE);
     
 
-    kInstance->itsKernelStack = (uint16_t*)malloc(sizeof(uint16_t) * MAX_KERNEL_STACK_SIZE);
+    kInstance->itsKernelStack = (uint8_t*)malloc(sizeof(uint8_t) * MAX_KERNEL_STACK_SIZE);
     kInstance->itsKernelSP = 0;
 
     
     
-    kInstance->memory = (uint16_t*)malloc(sizeof(uint16_t) * MAX_ADDRESS);
+    kInstance->memory = (int16_t*)malloc(sizeof(int16_t) * MAX_ADDRESS);
     for (uint16_t i = 0; i < MAX_ADDRESS; i++) // Reset all memory locations.
         kInstance->memory[i] = 0;
 
@@ -1086,28 +1086,18 @@ void load(Kernel kInstance, FILE *input)
 }
 #else
 
-#define loadLength (50)
-void load(Kernel kInstance, int16_t input[]){
+void load(Kernel kInstance, int16_t *input){
+
     uint16_t i = kInstance->ip = kInstance->pe;
-    uint16_t code;
-    PutX16(i);
-    PutN();
 
-    for(; i < loadLength * 1024; i++){
-        if (input[i] == -1) 
-             break;
-        code = input[i];
-        // PutC(code);
-        // PutX16(code);
-        // PutN();
-        kInstance->memory[i] = code;
+    // do {
+    //     kInstance->memory[i++] = *input++;
+    // } while (*input != -1);
+
+    while (*input != -1) {
+        kInstance->memory[i++] = *input++;
     }
-
-    for(int j = 1024; j < 50 * 1024; j++) {
-        PutX16(kInstance->memory[j]);
-        PutN();
-    }
-
+    
     // Use a factory to isolate the configuration. In Lecture 6.
 
     //t        printf("\n%d words loaded.\n", i - pe);
@@ -1130,9 +1120,11 @@ void run(Kernel kInstance) {
         //t            printf("ip=%02x opcode=%d", (ip-1024), opcode));
         
         opcode = (kInstance->memory[kInstance->ip++] - INSTR_TABLE);
-
+        
         PutS("Memory: ");
-        PutX16(kInstance->memory[kInstance->ip - 1]);
+        PutX16(kInstance->memory[kInstance->ip-1]);
+        // PutX16(kInstance->memory[kInstance->ip - 1]);
+        PutX16(opcode);
         PutN();
         // kInstance->ip = kInstance->ip + 1;
 
