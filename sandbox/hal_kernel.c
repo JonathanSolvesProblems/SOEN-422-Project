@@ -78,18 +78,18 @@ void runError(const char *msg)
 
 void preempt(Kernel kInstance)
 {
-    SetBp(kInstance->taskQueue[kInstance->taskCurrent], kInstance->bp);
-    SetSp(kInstance->taskQueue[kInstance->taskCurrent], kInstance->sp);
-    SetPe(kInstance->taskQueue[kInstance->taskCurrent], kInstance->pe);
-    SetIp(kInstance->taskQueue[kInstance->taskCurrent], kInstance->ip);
+    SetBp(*kInstance->taskQueue[kInstance->taskCurrent], kInstance->bp);
+    SetSp(*kInstance->taskQueue[kInstance->taskCurrent], kInstance->sp);
+    SetPe(*kInstance->taskQueue[kInstance->taskCurrent], kInstance->pe);
+    SetIp(*kInstance->taskQueue[kInstance->taskCurrent], kInstance->ip);
 }
 
 void resume(Kernel kInstance)
 {
-    kInstance->bp = GetBp(kInstance->taskQueue[kInstance->taskCurrent]);
-    kInstance->sp = GetSp(kInstance->taskQueue[kInstance->taskCurrent]);
-    kInstance->pe = GetPe(kInstance->taskQueue[kInstance->taskCurrent]);
-    kInstance->ip = GetIp(kInstance->taskQueue[kInstance->taskCurrent]);
+    kInstance->bp = GetBp(*kInstance->taskQueue[kInstance->taskCurrent]);
+    kInstance->sp = GetSp(*kInstance->taskQueue[kInstance->taskCurrent]);
+    kInstance->pe = GetPe(*kInstance->taskQueue[kInstance->taskCurrent]);
+    kInstance->ip = GetIp(*kInstance->taskQueue[kInstance->taskCurrent]);
     //t     printf("Resume: ip = %u\n", ip);
 }
 
@@ -917,10 +917,10 @@ void Cobegin(Kernel kInstance)
         kInstance->pe = kInstance->sp + length;
         kInstance->taskQueue[i] = createTask(MAX_QUEUE);
 
-        SetBp(kInstance->taskQueue[i], kInstance->bp);
-        SetSp(kInstance->taskQueue[i], kInstance->sp);
-        SetPe(kInstance->taskQueue[i], kInstance->pe);
-        SetIp(kInstance->taskQueue[i], kInstance->ip + kInstance->memory[kInstance->ip + i * 2 + 3] - 1);
+        SetBp(*kInstance->taskQueue[i], kInstance->bp);
+        SetSp(*kInstance->taskQueue[i], kInstance->sp);
+        SetPe(*kInstance->taskQueue[i], kInstance->pe);
+        SetIp(*kInstance->taskQueue[i], kInstance->ip + kInstance->memory[kInstance->ip + i * 2 + 3] - 1);
 
         kInstance->sp = kInstance->pe;
     }
