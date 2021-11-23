@@ -32,6 +32,7 @@ int main() {
         if ( (status = hal_Loader(mem)) == Success ) {
             DisplayBanner();
 
+            // kernel->run(mem);
             kernel->run(mem);
 
             // Send an Ack to tell the Host that program's execution is done.
