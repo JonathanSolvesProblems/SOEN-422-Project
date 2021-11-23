@@ -49,7 +49,7 @@ typedef struct KernelDesc {
     // task
     // const int MAX_QUEUE = 10;  // int8_t
 
-    Task *taskQueue;  // Task taskQueue[];
+    Task **taskQueue;  // Task taskQueue[];
     uint8_t taskCurrent;   // this  // int8_t
     uint8_t numberOfTasks; // tasks  // int8_t
 
@@ -1013,7 +1013,7 @@ void PutInteger(Kernel kInstance)
     //     // PutS("PutInteger");
     //     // PutC(intToChar(kInstance->memory[kInstance->sp]));
     // #endif
-    PutI(kInstance->memory[kInstance->sp]);
+    PutX16(kInstance->memory[kInstance->sp]);
     kInstance->sp = kInstance->sp - 1;
 }
 void PutCharacter(Kernel kInstance)
@@ -1060,11 +1060,11 @@ Kernel createKernel() { // TODO: Init to clean up.
     kInstance->numberOfTasks = 1;
     
     
-    // kInstance->taskQueue = createDoubleArrayTask(MAX_QUEUE);
-    kInstance->taskQueue = (Task*) malloc(MAX_QUEUE*sizeof(Task));
+    kInstance->taskQueue = createDoubleArrayTask(MAX_QUEUE);
+    // kInstance->taskQueue = (Task*)malloc(MAX_QUEUE*sizeof(Task));
     
     for (uint8_t i = 0; i < MAX_QUEUE; i++) 
-        kInstance->taskQueue[i] = (Task*)createTask(MAX_QUEUE);
+        kInstance->taskQueue[i] = createTask(MAX_QUEUE);
     
 
     kInstance->itsKernelStack = (uint8_t*)malloc(sizeof(uint8_t) * MAX_KERNEL_STACK_SIZE);
@@ -1477,3 +1477,9 @@ void run(Kernel kInstance) {
     }
 }
 
+void Kernel_Delete(Kernel kInstance) {
+    free(kInstance->taskQueue);
+    free(kInstance->itsKernelStack);
+    free(kInstance->memory);
+    free(kInstance);
+}

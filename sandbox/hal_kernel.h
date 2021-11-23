@@ -16,5 +16,6 @@ void load(Kernel kInstance, FILE *input);
 void load(Kernel kInstance, int16_t input[]);
 #endif
 void run(Kernel kInstance);
+void Kernel_Delete(Kernel k) {
 
 #endif
