@@ -37,15 +37,7 @@ int main(int argc, char **args)
     return 0;
 }
 #else
-void test(int16_t input[]) {
-    for(int i = 0; i < 40; i++){
-        if (input[i] == -1) 
-             break;
-        // PutC(code);
-        PutX16(input[i]);
-        PutN();
-    }
-}
+
 int main()
 {
     bsl_Uart_Init();

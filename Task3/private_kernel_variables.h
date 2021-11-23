@@ -79,11 +79,3 @@
 #define PUTB 75
 #define PUTN 76
 
-#define MAX_KERNEL_STACK_SIZE 100
-#define MAX_QUEUE 10
-#define MIN_ADDRESS 0
-#define MAX_ADDRESS 20000 // 1024
-#define SPACE (int)(' ')
-#define INSTR_TABLE 400
-#define SET_LENGTH 0x8
-#define SET_LIMIT 127

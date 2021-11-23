@@ -5,6 +5,15 @@
 #include <stdlib.h>
 #include "private_kernel_variables.h"
 
+#define MAX_KERNEL_STACK_SIZE 100
+#define MAX_QUEUE 10
+#define MIN_ADDRESS 0
+#define MAX_ADDRESS 4095  // 20000
+#define SPACE (int)(' ')
+#define INSTR_TABLE 400
+#define SET_LENGTH 0x8
+#define SET_LIMIT 127
+
 typedef struct KernelDesc {
     
     // temporary fields for stack evaluation
@@ -983,8 +992,8 @@ void PutInteger(Kernel kInstance)
     #if defined(Host)
         printf("%d", kInstance->memory[kInstance->sp]);
     #else
-        PutS("PutInteger");
-        PutC(intToChar(kInstance->memory[kInstance->sp]));
+        // PutS("PutInteger");
+        // PutC(intToChar(kInstance->memory[kInstance->sp]));
     #endif
     
     kInstance->sp = kInstance->sp - 1;
@@ -995,9 +1004,9 @@ void PutCharacter(Kernel kInstance)
         printf("%c", (char)kInstance->memory[kInstance->sp]);
     #else
         
-        PutS("PutCharacter");
-        PutN();
-        PutC(intToChar(kInstance->memory[kInstance->sp]));
+        // PutS("PutCharacter");
+        // PutN();
+        // PutC(intToChar(kInstance->memory[kInstance->sp]));
     #endif
          
     kInstance->sp = kInstance->sp - 1;
@@ -1033,7 +1042,7 @@ Kernel createKernel(uint16_t size) { // TODO: Init to clean up.
         kInstance->taskQueue[i] = (Task*)createTask(MAX_QUEUE);
     
 
-    kInstance->itsKernelStack = (uint8_t*)malloc(sizeof(uint8_t) * MAX_KERNEL_STACK_SIZE);
+    kInstance->itsKernelStack = (uint16_t*)malloc(sizeof(uint16_t) * MAX_KERNEL_STACK_SIZE);
     kInstance->itsKernelSP = 0;
 
     
@@ -1080,9 +1089,11 @@ void load(Kernel kInstance, FILE *input)
 #define loadLength (50)
 void load(Kernel kInstance, int16_t input[]){
     uint16_t i = kInstance->ip = kInstance->pe;
-    int16_t code;
+    uint16_t code;
+    PutX16(i);
+    PutN();
 
-    for(i = 0; i < loadLength; i++){
+    for(; i < loadLength * 1024; i++){
         if (input[i] == -1) 
              break;
         code = input[i];
@@ -1090,6 +1101,11 @@ void load(Kernel kInstance, int16_t input[]){
         // PutX16(code);
         // PutN();
         kInstance->memory[i] = code;
+    }
+
+    for(int j = 1024; j < 50 * 1024; j++) {
+        PutX16(kInstance->memory[j]);
+        PutN();
     }
 
     // Use a factory to isolate the configuration. In Lecture 6.
@@ -1104,26 +1120,21 @@ void load(Kernel kInstance, int16_t input[]){
 
 void run(Kernel kInstance) {
     int16_t opcode = 0;
+
+    #if !defined(Host)
+        // kInstance->ip = kInstance->ip - 1024;
+    #endif
+    
     while (1)
     {
         //t            printf("ip=%02x opcode=%d", (ip-1024), opcode));
+        
+        opcode = (kInstance->memory[kInstance->ip++] - INSTR_TABLE);
 
-        PutX16(kInstance->ip);
+        PutS("Memory: ");
+        PutX16(kInstance->memory[kInstance->ip - 1]);
         PutN();
-
-        #if defined(Host)
-            opcode = (kInstance->memory[kInstance->ip++] - INSTR_TABLE);
-        #else
-            opcode = (kInstance->memory[(kInstance->ip++) - 1024] - INSTR_TABLE);
-        #endif
         // kInstance->ip = kInstance->ip + 1;
-
-        PutS("OpCode");
-        PutN();
-        PutX16(opcode);
-        PutN();
-        PutX16(kInstance->ip);
-        PutN();
 
         switch (opcode)
         {

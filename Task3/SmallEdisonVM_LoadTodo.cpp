@@ -190,8 +190,6 @@ public:
             i++;
         }
 
-        
-
         // Use a factory to isolate the configuration. In Lecture 6.
 
         fclose(input);
