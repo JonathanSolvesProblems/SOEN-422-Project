@@ -16,6 +16,10 @@ void load(Kernel kInstance, FILE *input);
 void load(Kernel kInstance, int16_t input[]);
 #endif
 void run(Kernel kInstance);
+
+void kernelClearMemory(Kernel kInstance);
+
+void loadInMemory(Kernel kInstance, uint8_t* memory);
 // void Kernel_Delete(Kernel k) {
-    
+
 #endif

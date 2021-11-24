@@ -1,11 +1,8 @@
 #include <stdint.h>
 #include <stdlib.h> // malloc, free
-#include "hal_task.h"
-#include "hal_kernel.h"
-#include "../Task1/COutForAUnit.h"
-#include "private_kernel_variables.h"
-#include "../Shared/shared.h"
-#include <string.h>
+#include "Task.h"
+#include "Kernel.h"
+#include "COutForAUnit.h"
 
 typedef struct KernelDesc {
     int8_t v1, v2;
@@ -45,6 +42,13 @@ typedef struct KernelDesc {
 
 } KernelDesc, *Kernel;
 
+
+Kernel Kernel_New() {
+    Kernel k = (Kernel) malloc(sizeof(KernelDesc)); // Allocate space to the queue
+    Kernel_Init(k);
+    return k;
+}
+
 void Kernel_Init(Kernel k) {
     k->MAX_KERNEL_STACK_SIZE = 100;
     k->MAX_QUEUE = 10;
@@ -70,7 +74,7 @@ void Kernel_Init(Kernel k) {
     k->numberOfTasks = 1;
     k->taskQueue = (Task*) malloc(k->MAX_QUEUE*sizeof(Task));
     for (int8_t i = 0; i < k->MAX_QUEUE; i++)
-      k->taskQueue[i] = createTask(10);
+      k->taskQueue[i] = Task_New();
 
     k->itsKernelStack = (int8_t*) malloc(k->MAX_KERNEL_STACK_SIZE*sizeof(int8_t));
     k->itsKernelSP = 0;
@@ -86,55 +90,49 @@ void Kernel_Init(Kernel k) {
     k->lineNo = 0;
 }
 
-Kernel createKernel() {
-    Kernel k = (Kernel) malloc(sizeof(KernelDesc)); // Allocate space to the queue
-    Kernel_Init(k);
-    return k;
+void load(Kernel k, FILE *input)
+{
+    uint16_t i = k->ip = k->pe;
+    char line[10];
+    int16_t code;
+    while (fgets(line, 10, input) != NULL)
+    {
+        code = atoi(line);
+        k->memory[i++] = code;
+    }
+    fclose(input);
 }
 
-// void load(Kernel k, FILE *input)
-// {
-//     uint16_t i = k->ip = k->pe;
-//     char line[10];
-//     int16_t code;
-//     while (fgets(line, 10, input) != NULL)
-//     {
-//         code = atoi(line);
-//         k->memory[i++] = code;
-//     }
-//     fclose(input);
-// }
+void loadMem(Kernel k, uint8_t* mem) {
+    uint16_t i = k->ip = k->pe;
+    char* line = (char*) malloc(10*sizeof(char));
+    int16_t code;
+    uint8_t count = 0;
+    while(*mem) {
+        if(*mem == 0x0A) {
+            code = atoi(line);
+            k->memory[i++] = code;
+            memset(line, 0, 10);
+            count = 0;
+        }
+        else if(*mem == 0x2D) {
+            k->memory[i++] = -1;
+            break;
+        }
+        else {
+            line[count++] = *mem;
+        }
+        mem++;
+    }
+    free(line);
+}
 
 
-void load(Kernel k, int16_t *input) {
+void loadInput(Kernel k, int16_t *input) {
     uint16_t i = k->ip = k->pe;
     do {
         k->memory[i++] = *input++;
     } while (*input != -1);
-}
-
-void loadInMemory(Kernel kInstance, uint8_t* memory) {
-    uint16_t i = kInstance->ip = kInstance->pe;
-    int8_t lineSize = 10;
-    char* line = (char*)malloc(sizeof(char) * lineSize);
-    int16_t code;
-    uint8_t count = 0;
-    while (*memory) {
-        if (*memory == 0x0A) {
-            code = atoi(line);
-            kInstance->memory[i++] = code;
-            memset(line, 0, lineSize);
-            count = 0;
-        }
-        else if (*memory == 0x2D) {
-            kInstance->memory[i++] = -1;
-            break;
-        } else {
-            line[count++] = *memory;
-        }
-        memory++;
-    }
-    free(line);
 }
 
 void runError(const char *msg)
@@ -144,22 +142,19 @@ void runError(const char *msg)
     exit(1);
 }
 
-void preempt(Kernel kInstance)
+void preempt(Kernel k)
 {
-    // Task current = kInstance->taskQueue[kInstance->taskCurrent];
-    SetBp(kInstance->taskQueue[kInstance->taskCurrent], kInstance->bp);
-    SetSp(kInstance->taskQueue[kInstance->taskCurrent], kInstance->sp);
-    SetPe(kInstance->taskQueue[kInstance->taskCurrent], kInstance->pe);
-    SetIp(kInstance->taskQueue[kInstance->taskCurrent], kInstance->ip);
+    Task current = k->taskQueue[k->taskCurrent];
+    Task_Set(current, k->bp, k->sp, k->pe, k->ip);
 }
 
 void resume(Kernel k)
 {
     Task current = k->taskQueue[k->taskCurrent];
-    k->bp = GetBp(current);
-    k->sp = GetSp(current);
-    k->pe = GetPe(current);
-    k->ip = GetIp(current);
+    k->bp = Task_Get_bp(current);
+    k->sp = Task_Get_sp(current);
+    k->pe = Task_Get_pe(current);
+    k->ip = Task_Get_ip(current);
 }
 
 /** goto: op displacement */
@@ -977,12 +972,9 @@ void Cobegin(Kernel k)
     for (int8_t i = 0; i < numOfTask; i++)
     {
         k->pe = k->sp + length;
-        k->taskQueue[i] = createTask(10);
+        k->taskQueue[i] = Task_New();
         Task current = k->taskQueue[i];
-        SetBp(current, k->bp);
-        SetSp(current, k->sp);
-        SetPe(current, k->pe);
-        SetIp(current, k->ip + k->memory[k->ip + i * 2 + 3] - 1);
+        Task_Set(current, k->bp, k->sp, k->pe, k->ip + k->memory[k->ip + i * 2 + 3] - 1);
         k->sp = k->pe;
     }
     k->taskCurrent = 0;
@@ -1068,8 +1060,7 @@ void Field(Kernel k)
 //------------------------------------------- Extras
 void PutInteger(Kernel k)
 {
-    // PutC(k->memory[k->sp]);
-    PutC(int16ToChar(k->memory[k->sp]));
+    PutI(k->memory[k->sp]);
     k->sp = k->sp - 1;
 }
 void PutCharacter(Kernel k)
@@ -1089,7 +1080,6 @@ void PutLine(Kernel k)
 void EndCode(Kernel k)
 {
     PutS(Equals() ? ".\n" : "F\n");
-    exit(0);
 }
 
 void run(Kernel k)
@@ -1191,7 +1181,7 @@ void run(Kernel k)
             break;
         case ENDCODE:
             EndCode(k);
-            break;
+            return;
         case GREATER:
             TestForGreater(k);
             break;
@@ -1253,9 +1243,9 @@ void run(Kernel k)
     }
 }
 
-void kernelClearMemory(Kernel kInstance) {
-    free(kInstance->taskQueue);
-    free(kInstance->itsKernelStack);
-    free(kInstance->memory);
-    free(kInstance);
+void Kernel_Delete(Kernel k) {
+    free(k->taskQueue);
+    free(k->itsKernelStack);
+    free(k->memory);
+    free(k);
 }

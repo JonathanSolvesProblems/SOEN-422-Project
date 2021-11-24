@@ -1,9 +1,8 @@
-// hal_Loader.h - Loader Interface
-
 #ifndef __hal_Loader_h
 #define __hal_Loader_h
 
 #include <stdint.h>
+#include "Kernel.h"
 
 #define Ack ((uint8_t)0xCC)
 #define Nak ((uint8_t)0x33)
@@ -36,5 +35,4 @@ typedef enum {
 } Cmd;
 
 uint8_t hal_Loader(uint8_t* mem);
-
 #endif
