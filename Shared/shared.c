@@ -14,6 +14,6 @@ int16_t charToI16(char c) {
     return (c - '0');
 }
 /* int16_t*/
-char i16ToChar(int16_t u16) {
+char int16ToChar(int16_t u16) {
     return (u16 + '0');
 }

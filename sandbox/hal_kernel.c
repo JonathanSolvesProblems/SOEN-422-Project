@@ -1,4 +1,4 @@
-#include "hal_kernel.h"
+// #include "hal_kernel.h"
 #include "hal_task.h"
 #include <stdbool.h>
 #include "../Task1/COutForAUnit.h"
@@ -915,7 +915,7 @@ void Cobegin(Kernel kInstance)
     for (uint8_t i = 0; i < numOfTask; i++)
     {
         kInstance->pe = kInstance->sp + length;
-        kInstance->taskQueue[i] = createTask(MAX_QUEUE);
+        *kInstance->taskQueue[i] = createTask(MAX_QUEUE);
 
         SetBp(*kInstance->taskQueue[i], kInstance->bp);
         SetSp(*kInstance->taskQueue[i], kInstance->sp);
@@ -1477,9 +1477,9 @@ void run(Kernel kInstance) {
     }
 }
 
-void Kernel_Delete(Kernel kInstance) {
-    free(kInstance->taskQueue);
-    free(kInstance->itsKernelStack);
-    free(kInstance->memory);
-    free(kInstance);
-}
+// void Kernel_Delete(Kernel kInstance) {
+//     free(kInstance->taskQueue);
+//     free(kInstance->itsKernelStack);
+//     free(kInstance->memory);
+//     free(kInstance);
+// }
