@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include "../Shared/shared.h" // conversion functions
 
 #define CharEnd (218)
 
@@ -34,13 +35,7 @@ static TestEntry tests[TestMax] = {
 //  Test9
 };
 
-uint8_t charToU8(char c) {
-    return (c - '0');
-}
 
-char intToChar(uint8_t u8) {
-    return (u8 + '0');
-}
 
 #define MaxLineSize (40)
 /*-------------------------------------------------------------------
