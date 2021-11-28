@@ -20,7 +20,7 @@ static void DisplayBanner() {
     PutS(Copyright); PutN();
 }
 
-#define MemMax 420 // 36
+#define MemMax 256
 #define KernelSize 40
 
 static uint8_t  mem[MemMax];

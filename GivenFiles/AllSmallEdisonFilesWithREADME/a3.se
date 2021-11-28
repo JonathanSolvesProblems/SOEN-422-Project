@@ -1,0 +1,27 @@
+proc a3
+
+    module 
+        *const  Size = 3
+        *record Dev(id:int; name: char)
+        *array  DevTable [1 : Size] (Dev)
+        *var    dt: DevTable
+        *var    d1,d2,d3: Dev
+
+    begin
+        d1 := Dev(1,'A');
+        d2 := Dev(2,'B');
+        d3 := Dev(3,'C');
+        dt[1] := d1;
+        dt[2] := d2;
+        dt[3] := d3
+    end
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('a'); putc('3'); putn();
+    puti(3); puti(1); putc('A'); puti(2); putc('B'); puti(3); putc('C'); putn();
+    puti( Size );
+    puti( d1.id );    putc( d1.name );
+    puti( dt[2].id ); putc( dt[2].name );
+    puti( dt[3].id ); putc( dt[3].name );
+    putn()
+end

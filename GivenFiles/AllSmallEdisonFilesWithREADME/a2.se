@@ -1,0 +1,29 @@
+proc a2
+
+module 
+     const length = 3
+     array BitMap [1 : length] (bool)
+    *var   bits:BitMap
+    
+    *proc  putBits
+    var   n:int
+    begin 
+        n := 1;
+        putc('[');
+        while n <= length do
+            putb(bits[n]);
+            n := n + 1
+        end;
+        putc(']');
+        putn()
+    end    
+begin 
+    bits[2] := true
+end
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('a'); putc('2'); putn();
+    putc('['); putb(false); putb(true); putb(false); putc(']'); putn();
+    putBits
+end
+

@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <stdlib.h> // malloc, free
+#include <stdlib.h> 
 #include "hal_task.h"
 #include "hal_kernel.h"
 #include "../Task1/COutForAUnit.h"
@@ -92,19 +92,20 @@ Kernel createKernel() {
     return k;
 }
 
-// void load(Kernel k, FILE *input)
-// {
-//     uint16_t i = k->ip = k->pe;
-//     char line[10];
-//     int16_t code;
-//     while (fgets(line, 10, input) != NULL)
-//     {
-//         code = atoi(line);
-//         k->memory[i++] = code;
-//     }
-//     fclose(input);
-// }
-
+#if defined(Host)
+    void load(Kernel k, FILE *input)
+    {
+        uint16_t i = k->ip = k->pe;
+        char line[10];
+        int16_t code;
+        while (fgets(line, 10, input) != NULL)
+        {
+            code = atoi(line);
+            k->memory[i++] = code;
+        }
+        fclose(input);
+    }
+#else
 
 void load(Kernel k, int16_t *input) {
     uint16_t i = k->ip = k->pe;
@@ -112,6 +113,8 @@ void load(Kernel k, int16_t *input) {
         k->memory[i++] = *input++;
     } while (*input != -1);
 }
+
+#endif
 
 void loadInMemory(Kernel kInstance, uint8_t* memory) {
     uint16_t i = kInstance->ip = kInstance->pe;

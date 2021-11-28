@@ -1,0 +1,25 @@
+proc a1
+
+module 
+    *const nameLength = 2
+     array Name [0 : nameLength] (char)
+    *var   name:Name
+    
+    *proc  putName
+    begin 
+        putc(name[0]); 
+        putc(name[1]); 
+        putn()
+    end    
+begin 
+    name[0] := 'A';
+    name[1] := '#';
+    name[2] := char(0)
+end
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('a'); putc('1'); putn();
+    putc('A'); putc('#'); putn();
+    putName
+end
+

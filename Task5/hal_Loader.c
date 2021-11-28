@@ -19,7 +19,7 @@ uint8_t hal_Loader(uint8_t* mem) {
         sum += mem[i];
     }
 
-    bsl_Uart_RxChar();
+    // bsl_Uart_RxChar();
 
     switch(cmd) {
         case GetStatus:

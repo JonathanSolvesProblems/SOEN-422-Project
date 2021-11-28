@@ -20,8 +20,8 @@ int main(int argc, char **args)
         usage();
     
     char filename[32];
-    strcpy(filename, args[1]); // Save name and extension.
-                               //tt    printf("Filename: '%s'\n", filename);
+    strcpy(filename, args[1]); 
+                              
 
     FILE *file = fopen(filename, "r");
     if (file == NULL)
@@ -30,7 +30,7 @@ int main(int argc, char **args)
         return -1;
     }
 
-    Kernel kernel = createKernel(KERNEL_SIZE);
+    Kernel kernel = createKernel();
     load(kernel, file);
     run(kernel);
 
