@@ -9,6 +9,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
+#include "bsl_Uart.h"
 
 void ResetBuffer(void);
 bool Equals(void);

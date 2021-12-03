@@ -1,10 +1,7 @@
 /* COutForAUnit_task1_todo.c - COut for AUnit
 */
 
-#include <string.h>
 #include "COutForAUnit.h"
-
-#include "bsl_Uart.h"
 
 #if defined(Host)
     #include <stdio.h>

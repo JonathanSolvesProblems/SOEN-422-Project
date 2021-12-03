@@ -2,10 +2,6 @@
 
 #include "COutForAUnit.h"
 
-#include "bsl_Uart.h"
-
-#include <stdint.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include "../Shared/shared.h" // conversion functions
 
