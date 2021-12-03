@@ -31,7 +31,7 @@ int main() {
     while (true) {
         uint8_t status = Success;
 
-        if ( (status = hal_Loader(mem)) == Success ) {
+        if ((status = hal_Loader(mem)) == Success) {
             DisplayBanner();
             
             // Send an Ack to tell the Host that program's execution is done.

@@ -1,0 +1,42 @@
+Test f0
+0
+0
+Test f1
+0
+0
+Test f2
+2350
+2350
+Test f3
+falsetrue
+falsetrue
+Test f4
+15-150truefalsetruefalsetrue
+15-150truefalsetruefalsetrue
+Test f6
+12
+12
+Test a0
+4018018
+4018018
+Test a1
+A#
+A#
+Test a2
+[falsetruefalse]
+[falsetruefalse]
+Test a3
+31A2B3C
+31A2B3C
+Test c0
+A#
+A#
+Test c1
+*0true#35
+*0true#35
+Test m0
+313
+313
+Test r0
+12
+12

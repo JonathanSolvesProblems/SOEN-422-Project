@@ -1,0 +1,16 @@
+proc recordTest0
+
+    module 
+        *record Dev(id, prio: int)
+        *var d: Dev
+
+    begin
+        d := Dev(1,2)
+    end
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('r'); putc('0'); putn();
+    putc('1'); putc('2'); putn();
+    
+    puti( d.id ); puti( d.prio ); putn()
+end

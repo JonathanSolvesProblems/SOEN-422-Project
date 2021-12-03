@@ -93,18 +93,43 @@ Kernel createKernel() {
 }
 
 #if defined(Host)
+    // void load(Kernel k, FILE *input)
+    // {
+    //     uint16_t i = k->ip = k->pe;
+    //     char line[10];
+    //     int16_t code;
+    //     while (fgets(line, 10, input) != NULL)
+    //     {
+    //         code = atoi(line);
+    //         k->memory[i++] = code;
+    //     }
+    //     fclose(input);
+    // }
+
+    // FOR BIN FILES
     void load(Kernel k, FILE *input)
     {
-        uint16_t i = k->ip = k->pe;
-        char line[10];
-        int16_t code;
-        while (fgets(line, 10, input) != NULL)
+        char line[256];
+        uint8_t code;
+        fread(line,sizeof(line),1,input);
+
+        for (uint8_t i = 0; i < 256; i++)
         {
-            code = atoi(line);
-            k->memory[i++] = code;
+            if (line[i] == -1)
+                break;
+
+            if (line[i] < 0)
+                code = (int8_t)line[i];
+            else
+                code = (uint8_t)line[i]; // + 128;
+            printf("%d ", code);
+
         }
+
         fclose(input);
+        exit(0);
     }
+
 #else
 
 void load(Kernel k, int16_t *input) {
@@ -116,6 +141,7 @@ void load(Kernel k, int16_t *input) {
 
 #endif
 
+// TODO: TO CHANGE
 void loadInMemory(Kernel kInstance, uint8_t* memory) {
     uint16_t i = kInstance->ip = kInstance->pe;
     int8_t lineSize = 10;

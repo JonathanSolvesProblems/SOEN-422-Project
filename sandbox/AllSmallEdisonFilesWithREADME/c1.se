@@ -1,0 +1,11 @@
+proc testConstConstructorCasting
+
+const star = '*'; zero = 0; on = true; sharp = 35
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('c'); putc('1'); putn();
+    putc('*'); putc('0'); putb(true); putc('#'); puti(35); putn();
+    
+    putc(star); puti(zero); putb(on); putc( char(sharp) ); puti( int(sharp) );
+    putn()
+end

@@ -1,0 +1,225 @@
+00 43  Procedure
+01 0  [00]x
+02 2  [02]x
+03 0  [00]x
+04 0  
+05 6   Constant
+06 84 
+07 74  putc
+08 6   Constant
+09 101
+0a 74  putc
+0b 6   Constant
+0c 115
+0d 74  putc
+0e 6   Constant
+0f 116
+10 74  putc
+11 6   Constant
+12 32 
+13 74  putc
+14 6   Constant
+15 102
+16 74  putc
+17 6   Constant
+18 52 
+19 74  putc
+1a 76  putn
+1b 6   Constant
+1c 15 
+1d 73  puti
+1e 6   Constant
+1f 15 
+20 29  Minus
+21 0  
+22 73  puti
+23 6   Constant
+24 0  
+25 73  puti
+26 6   Constant
+27 1  
+28 75  putb
+29 6   Constant
+2a 0  
+2b 75  putb
+2c 6   Constant
+2d 1  
+2e 75  putb
+2f 6   Constant
+30 0  
+31 75  putb
+32 6   Constant
+33 1  
+34 75  putb
+35 76  putn
+36 25  Instance
+37 0  
+38 49  Variable
+39 5  [05]x
+3a 6   Constant
+3b 3  
+3c 6   Constant
+3d 4  
+3e 31  Multiply
+3f 0  
+40 6   Constant
+41 6  
+42 6   Constant
+43 2  
+44 9   Divide
+45 0  
+46 0   Add
+47 0  
+48 3   Assign
+49 1  [01]x
+4a 25  Instance
+4b 0  
+4c 49  Variable
+4d 5  [05]x
+4e 48  Value
+4f 1  [01]x
+50 73  puti
+51 25  Instance
+52 0  
+53 49  Variable
+54 5  [05]x
+55 48  Value
+56 1  [01]x
+57 29  Minus
+58 0  
+59 73  puti
+5a 25  Instance
+5b 0  
+5c 49  Variable
+5d 5  [05]x
+5e 48  Value
+5f 1  [01]x
+60 6   Constant
+61 3  
+62 30  Modulo
+63 0  
+64 73  puti
+65 25  Instance
+66 0  
+67 49  Variable
+68 6  [06]x
+69 6   Constant
+6a 1  
+6b 6   Constant
+6c 2  
+6d 17  Equal
+6e 1  [01]x
+6f 33  Not
+70 3   Assign
+71 1  [01]x
+72 25  Instance
+73 0  
+74 49  Variable
+75 6  [06]x
+76 48  Value
+77 1  [01]x
+78 75  putb
+79 25  Instance
+7a 0  
+7b 49  Variable
+7c 6  [06]x
+7d 6   Constant
+7e 1  
+7f 6   Constant
+80 2  
+81 17  Equal
+82 1  [01]x
+83 3   Assign
+84 1  [01]x
+85 25  Instance
+86 0  
+87 49  Variable
+88 6  [06]x
+89 48  Value
+8a 1  [01]x
+8b 75  putb
+8c 25  Instance
+8d 0  
+8e 49  Variable
+8f 6  [06]x
+90 6   Constant
+91 0  
+92 6   Constant
+93 3  
+94 34  Notequal
+95 1  [01]x
+96 3   Assign
+97 1  [01]x
+98 25  Instance
+99 0  
+9a 49  Variable
+9b 6  [06]x
+9c 48  Value
+9d 1  [01]x
+9e 75  putb
+9f 25  Instance
+a0 0  
+a1 49  Variable
+a2 6  [06]x
+a3 6   Constant
+a4 1  
+a5 6   Constant
+a6 2  
+a7 17  Equal
+a8 1  [01]x
+a9 6   Constant
+aa 0  
+ab 6   Constant
+ac 3  
+ad 34  Notequal
+ae 1  [01]x
+af 2   And
+b0 3   Assign
+b1 1  [01]x
+b2 25  Instance
+b3 0  
+b4 49  Variable
+b5 6  [06]x
+b6 48  Value
+b7 1  [01]x
+b8 75  putb
+b9 25  Instance
+ba 0  
+bb 49  Variable
+bc 6  [06]x
+bd 6   Constant
+be 4  
+bf 6   Constant
+c0 5  
+c1 27  Less
+c2 6   Constant
+c3 6  
+c4 6   Constant
+c5 7  
+c6 35  Notgreater
+c7 2   And
+c8 6   Constant
+c9 8  
+ca 6   Constant
+cb 9  
+cc 22  Greater
+cd 6   Constant
+ce 10 
+cf 6   Constant
+d0 11 
+d1 36  Notless
+d2 2   And
+d3 37  Or
+d4 3   Assign
+d5 1  [01]x
+d6 25  Instance
+d7 0  
+d8 49  Variable
+d9 6  [06]x
+da 48  Value
+db 1  [01]x
+dc 75  putb
+dd 76  putn
+de 15  Endproc
+df 12  Encode
+e0 -1 

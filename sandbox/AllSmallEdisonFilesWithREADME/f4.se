@@ -1,0 +1,29 @@
+proc f4
+
+var i:int; b:bool
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('f'); putc('4'); putn();
+    puti(15); puti(-15); puti(0); putb(true); putb(false); putb(true); putb(false); putb(true); putn();
+
+    i := 3*4 + 6 div 2;
+    puti(i); 
+    puti(-i);
+    puti(i mod 3); 
+
+    b := not(1 = 2);
+    putb(b); 
+
+    b := 1 = 2;
+    putb(b); 
+
+    b := 0 <> 3;
+    putb(b);
+  
+    b := (1 = 2) and (0 <> 3);
+    putb(b);
+  
+    b := (4 < 5) and (6 <= 7) or (8 > 9) and (10 >= 11); 
+    putb(b);  
+    putn()
+end
