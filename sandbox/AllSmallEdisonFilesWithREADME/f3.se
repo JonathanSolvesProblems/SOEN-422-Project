@@ -1,0 +1,14 @@
+proc f3
+
+var b:bool
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('f'); putc('3'); putn();
+    putb(false); putb(true); putn();
+
+    b := bool(0);
+    putb(b);
+    b := bool(1);
+    putb(b); 
+    putn()
+end

@@ -1,0 +1,16 @@
+proc f2
+
+var i,j:int
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('f'); putc('2'); putn();
+    putc('2'); putc('3'); putc('5'); putc('0'); putn();
+
+    i := 2;
+    j := i+1;
+    puti(i);
+    puti(i+1);
+    puti(j+2);
+    puti(i mod 2);
+    putn()
+end

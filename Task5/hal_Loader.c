@@ -42,5 +42,4 @@ uint8_t hal_Loader(uint8_t* mem) {
         default:
             return InvalidCmd;
     }
-
 }

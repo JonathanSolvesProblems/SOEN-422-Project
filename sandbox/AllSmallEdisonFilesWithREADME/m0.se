@@ -1,0 +1,22 @@
+proc system
+var i:int
+
+module 
+     array device [1:2] (int)
+    *var ids: device
+begin
+    ids[1] := 3;
+    i  := ids[1]
+end
+
+const optimized = 1
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('m'); putc('0'); putn();
+    puti(3); puti(1); puti(3); putn();
+
+    puti( ids[1] );
+    puti(optimized);
+    puti( i );
+    putn()
+end

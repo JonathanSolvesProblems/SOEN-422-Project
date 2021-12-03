@@ -1,0 +1,28 @@
+proc a0
+
+module
+     const localConst = 4
+    *const tableLength = 8
+     array Table [1 : tableLength] (int)
+    *var   table:Table
+     var   localTable:Table
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('a'); putc('0'); putn();
+    putc('4'); putc('0'); putc('1'); putc('8'); putc('0'); putc('1'); putc('8'); putn();
+
+    puti(localConst);
+    puti(localTable[1]);
+    localTable[1] := 1;
+    puti(localTable[1])
+end
+
+begin
+    puti(tableLength);
+    puti(table[1]);
+    table[1] := 1;
+    puti(table[1]);
+    table[tableLength] := tableLength;
+    puti(table[tableLength]);
+    putn()
+end
+

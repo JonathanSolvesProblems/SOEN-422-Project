@@ -23,7 +23,7 @@ int main(int argc, char **args)
     strcpy(filename, args[1]); 
                               
 
-    FILE *file = fopen(filename, "r");
+    FILE *file = fopen(filename, "rb");
     if (file == NULL)
     {
         printf("'%s' does not exist.\n", filename);

@@ -1,0 +1,68 @@
+00 43  Procedure
+01 0  [00]x
+02 1  [01]x
+03 0  [00]x
+04 0  
+05 6   Constant
+06 84 
+07 74  putc
+08 6   Constant
+09 101
+0a 74  putc
+0b 6   Constant
+0c 115
+0d 74  putc
+0e 6   Constant
+0f 116
+10 74  putc
+11 6   Constant
+12 32 
+13 74  putc
+14 6   Constant
+15 102
+16 74  putc
+17 6   Constant
+18 51 
+19 74  putc
+1a 76  putn
+1b 6   Constant
+1c 0  
+1d 75  putb
+1e 6   Constant
+1f 1  
+20 75  putb
+21 76  putn
+22 25  Instance
+23 0  
+24 49  Variable
+25 5  [05]x
+26 6   Constant
+27 0  
+28 3   Assign
+29 1  [01]x
+2a 25  Instance
+2b 0  
+2c 49  Variable
+2d 5  [05]x
+2e 48  Value
+2f 1  [01]x
+30 75  putb
+31 25  Instance
+32 0  
+33 49  Variable
+34 5  [05]x
+35 6   Constant
+36 1  
+37 3   Assign
+38 1  [01]x
+39 25  Instance
+3a 0  
+3b 49  Variable
+3c 5  [05]x
+3d 48  Value
+3e 1  [01]x
+3f 75  putb
+40 76  putn
+41 15  Endproc
+42 12  Encode
+43 -1 
