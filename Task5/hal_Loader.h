@@ -9,6 +9,8 @@
 #define Nak ((uint8_t)0x33)
 
 #define PacketSizeMax ((uint8_t)11)
+uint8_t packet[PacketSizeMax];
+
 
 typedef enum {
     Success = 0x40,
@@ -34,6 +36,8 @@ typedef enum {
     Reset,
     CmdEnd
 } Cmd;
+
+
 
 uint8_t hal_Loader(uint8_t* mem);
 

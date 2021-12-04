@@ -1,4 +1,4 @@
-#include "../sandbox/hal_kernel.h"
+#include "../Task3/hal_kernel.h"
 #include "../Task1/bsl_Uart.h"
 
 #define KERNEL_SIZE (100)

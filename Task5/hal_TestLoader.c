@@ -45,3 +45,24 @@ int main() {
     }
     return 0;
 }
+
+
+
+    
+
+
+
+    
+    // while (true) {
+    //     if(checkStatus == Success){
+    //         DisplayBanner();
+    //         hal_Loader(mem);
+    //         // PutC((char)Ack);
+    //         // PutC((char)0);
+    //         // PutS("Loader success!");
+    //     } else {
+    //         PutS("Loader error: "); PutX4(checkStatus); PutN();
+    //         return -1;
+    //     }
+        
+    // }

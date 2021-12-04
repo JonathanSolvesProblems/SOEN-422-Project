@@ -2,7 +2,7 @@
 #include <string.h>
 #include "../Task1/bsl_Uart.h"
 
-#define KERNEL_SIZE 100
+// #define KERNEL_SIZE 100
 
 static void usage()
 {
@@ -20,8 +20,8 @@ int main(int argc, char **args)
         usage();
     
     char filename[32];
-    strcpy(filename, args[1]); // Save name and extension.
-                               //tt    printf("Filename: '%s'\n", filename);
+    strcpy(filename, args[1]); 
+                              
 
     FILE *file = fopen(filename, "r");
     if (file == NULL)
@@ -30,7 +30,7 @@ int main(int argc, char **args)
         return -1;
     }
 
-    Kernel kernel = createKernel(KERNEL_SIZE);
+    Kernel kernel = createKernel();
     load(kernel, file);
     run(kernel);
 
@@ -46,7 +46,9 @@ int main()
     474, 406, 102, 474, 406, 48, 474, 476, 406, 48, 474, 476, 406, 0, 473, 476, 415, 412, -1
     };
 
-    Kernel kernel = createKernel(KERNEL_SIZE);
+    // Kernel kernel = createKernel(KERNEL_SIZE);
+    Kernel kernel = createKernel();
+
     load(kernel, memory);
     run(kernel);
 

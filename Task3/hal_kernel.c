@@ -1,41 +1,19 @@
-#include "hal_kernel.h"
+#include <stdint.h>
+#include <stdlib.h> 
 #include "hal_task.h"
-#include <stdbool.h>
+#include "hal_kernel.h"
 #include "../Task1/COutForAUnit.h"
-#include <stdlib.h>
 #include "private_kernel_variables.h"
-
-
-
-#if !defined(Host)
-    uint8_t debug = 1;
-#else
-    uint8_t debug = 0;
-#endif
-
-
-#define MAX_KERNEL_STACK_SIZE 100
-#define MAX_QUEUE 10
-#define MIN_ADDRESS 0
-#if defined(Host)
-    #define MAX_ADDRESS 20000
-#else
-    #define MAX_ADDRESS 100
-#endif
-#define SPACE (int)(' ')
-#define INSTR_TABLE 400
-#define SET_LENGTH 0x8
-#define SET_LIMIT 127
+#include "../Shared/shared.h"
+#include <string.h>
 
 typedef struct KernelDesc {
-    
-    // temporary fields for stack evaluation
-    uint8_t v1, v2;
+    int8_t v1, v2;
 
     // kernel
-    // const int MAX_KERNEL_STACK_SIZE = 100;
-    uint8_t *itsKernelStack; // stack
-    uint8_t itsKernelSP;     //  sp
+    int8_t MAX_KERNEL_STACK_SIZE;
+    int8_t *itsKernelStack; // stack
+    int8_t itsKernelSP;     //  sp
 
     // variable stack
     uint16_t bp; //  base pointer
@@ -46,29 +24,149 @@ typedef struct KernelDesc {
     uint16_t pe; //  program end
 
     // task
-    // const int MAX_QUEUE = 10;
+    int8_t MAX_QUEUE;
 
-    Task **taskQueue;  // Task taskQueue[];
-    uint8_t taskCurrent;   // this
-    uint8_t numberOfTasks; // tasks
+    Task *taskQueue;     // Task taskQueue[];
+    int8_t taskCurrent;   // this
+    int8_t numberOfTasks; // tasks
 
-    uint8_t taskStackTop; // stackTop
-    uint8_t taskProgTop;  // progTop
+    int8_t taskStackTop; // stackTop
+    int8_t taskProgTop;  // progTop
 
-    // const int MIN_ADDRESS = 0;
-    // const int MAX_ADDRESS = 20000;
-    // const int SPACE = (int)(' ');
-    // const int INSTR_TABLE = 400;
-    // const int SET_LENGTH = 0x8;
-    // const int SET_LIMIT = 127;
+    uint8_t MIN_ADDRESS;
+    uint16_t MAX_ADDRESS;
+    uint8_t SPACE;
+    uint16_t INSTR_TABLE;
+    uint16_t SET_LENGTH;
+    uint8_t SET_LIMIT;
 
     int16_t *memory;
-    uint8_t lineNo;
-} KernelDesc;
+    int8_t lineNo;
 
-// PRIVATE
+} KernelDesc, *Kernel;
 
-void runError(const char *msg, Kernel kInstance)
+void Kernel_Init(Kernel k) {
+    k->MAX_KERNEL_STACK_SIZE = 100;
+    k->MAX_QUEUE = 10;
+    k->MIN_ADDRESS = 0;
+#ifndef HOST // meaning if target
+    k->MAX_ADDRESS = 100;
+#else
+    k->MAX_ADDRESS = 20000;
+#endif
+    k->SPACE = (int8_t)(' ');
+    k->INSTR_TABLE = 400;
+    k->SET_LENGTH = 0x8;
+    k->SET_LIMIT = 127;
+
+
+    k->v1 = 0;
+    k->v2 = 0;
+    k->ip = 0;
+    k->taskStackTop = 0;
+    k->taskProgTop = 0;
+
+    k->taskCurrent = 0;
+    k->numberOfTasks = 1;
+    k->taskQueue = (Task*) malloc(k->MAX_QUEUE*sizeof(Task));
+    for (int8_t i = 0; i < k->MAX_QUEUE; i++)
+      k->taskQueue[i] = createTask(10);
+
+    k->itsKernelStack = (int8_t*) malloc(k->MAX_KERNEL_STACK_SIZE*sizeof(int8_t));
+    k->itsKernelSP = 0;
+
+    k->memory = (int16_t*) malloc(k->MAX_ADDRESS*sizeof(int16_t));
+    for (int16_t i = 0; i < k->MAX_ADDRESS; i++) // Reset all memory locations.
+        k->memory[i] = 0;
+
+    k->pe = 1024;
+    k->bp = 0;
+    k->sp = 4;
+    k->memory[k->sp] = 0; // no return
+    k->lineNo = 0;
+}
+
+Kernel createKernel() {
+    Kernel k = (Kernel) malloc(sizeof(KernelDesc)); // Allocate space to the queue
+    Kernel_Init(k);
+    return k;
+}
+
+#if defined(Host)
+    void load(Kernel k, FILE *input)
+    {
+        uint16_t i = k->ip = k->pe;
+        char line[10];
+        int16_t code;
+        while (fgets(line, 10, input) != NULL)
+        {
+            code = atoi(line);
+            k->memory[i++] = code;
+        }
+        fclose(input);
+    }
+
+    // FOR BIN FILES
+    void loadBin(Kernel k, FILE *input)
+    {
+        char line[256];
+        uint8_t code;
+        fread(line,sizeof(line),1,input);
+
+        for (uint8_t i = 0; i < 256; i++)
+        {
+            if (line[i] == -1)
+                break;
+
+            if (line[i] < 0)
+                code = (int8_t)line[i];
+            else
+                code = (uint8_t)line[i]; // + 128;
+            printf("%d ", code);
+
+        }
+
+        fclose(input);
+        exit(0);
+    }
+
+#else
+
+void load(Kernel k, int16_t *input) {
+    uint16_t i = k->ip = k->pe;
+    do {
+        k->memory[i++] = *input++;
+    } while (*input != -1);
+}
+
+#endif
+
+// TODO: TO CHANGE
+void loadInMemory(Kernel kInstance, uint8_t* memory) {
+    uint16_t i = kInstance->ip = kInstance->pe;
+    int8_t lineSize = 10;
+    char* line = (char*)malloc(sizeof(char) * lineSize);
+    int16_t code;
+    uint8_t count = 0;
+    while (*memory) {
+        if (*memory == 0x0A) {
+            code = atoi(line);
+            kInstance->memory[i++] = code;
+            memset(line, 0, lineSize);
+            count = 0;
+        }
+        else if (*memory == 0x2D) {
+            kInstance->memory[i++] = -1;
+            break;
+        } else {
+            line[count++] = *memory;
+        }
+        memory++;
+    }
+    free(line);
+}
+
+void runError(const char *msg)
 {
     PutS(msg);
     PutN();
@@ -77,492 +175,487 @@ void runError(const char *msg, Kernel kInstance)
 
 void preempt(Kernel kInstance)
 {
-    SetBp(*kInstance->taskQueue[kInstance->taskCurrent], kInstance->bp);
-    SetSp(*kInstance->taskQueue[kInstance->taskCurrent], kInstance->sp);
-    SetPe(*kInstance->taskQueue[kInstance->taskCurrent], kInstance->pe);
-    SetIp(*kInstance->taskQueue[kInstance->taskCurrent], kInstance->ip);
+    // Task current = kInstance->taskQueue[kInstance->taskCurrent];
+    SetBp(kInstance->taskQueue[kInstance->taskCurrent], kInstance->bp);
+    SetSp(kInstance->taskQueue[kInstance->taskCurrent], kInstance->sp);
+    SetPe(kInstance->taskQueue[kInstance->taskCurrent], kInstance->pe);
+    SetIp(kInstance->taskQueue[kInstance->taskCurrent], kInstance->ip);
 }
 
-void resume(Kernel kInstance)
+void resume(Kernel k)
 {
-    kInstance->bp = GetBp(*kInstance->taskQueue[kInstance->taskCurrent]);
-    kInstance->sp = GetSp(*kInstance->taskQueue[kInstance->taskCurrent]);
-    kInstance->pe = GetPe(*kInstance->taskQueue[kInstance->taskCurrent]);
-    kInstance->ip = GetIp(*kInstance->taskQueue[kInstance->taskCurrent]);
-    //t     printf("Resume: ip = %u\n", ip);
+    Task current = k->taskQueue[k->taskCurrent];
+    k->bp = GetBp(current);
+    k->sp = GetSp(current);
+    k->pe = GetPe(current);
+    k->ip = GetIp(current);
 }
 
 /** goto: op displacement */
-void Goto(Kernel kInstance)
+void Goto(Kernel k)
 {
-    //t     printf("Goto\n");
-    int8_t displacement = kInstance->memory[kInstance->ip];
-    kInstance->ip = kInstance->ip + displacement - 1;
+    // t     PutS("Goto\n");
+    int8_t displacement = k->memory[k->ip];
+    k->ip = k->ip + displacement - 1;
 }
 
 /** proc: op   paramLength, varLength, tempLength, lineNo */
-void Procedure(Kernel kInstance)
+void Procedure(Kernel k)
 {
-    
-    uint8_t paramLength = kInstance->memory[kInstance->ip];
-    uint8_t varLength = kInstance->memory[kInstance->ip + 1];
-    uint8_t tempLength = kInstance->memory[kInstance->ip + 2];
-    kInstance->lineNo = kInstance->memory[kInstance->ip + 3];
+    int8_t paramLength = k->memory[k->ip];
+    int8_t varLength = k->memory[k->ip + 1];
+    int8_t tempLength = k->memory[k->ip + 2];
+    k->lineNo = k->memory[k->ip + 3];
 
-    //t     printf("Procedure: sp = %u\n", sp);
-    kInstance->memory[kInstance->bp + 2] = kInstance->bp - paramLength - 1;
-    kInstance->sp = kInstance->sp + varLength;
-    if ((kInstance->sp + tempLength) > kInstance->pe)
+    // t     PutS("Procedure: sp = %u\n", sp);
+    k->memory[k->bp + 2] = k->bp - paramLength - 1;
+    k->sp = k->sp + varLength;
+    if ((k->sp + tempLength) > k->pe)
     {
-        runError("Stack overflows: sp", kInstance);
+        runError("Stack overflows: sp");
     }
-    kInstance->ip = kInstance->ip + 4;
-    // PutS("HERE ");
-    // PutX16(kInstance->ip);
-    // PutN();
+    k->ip = k->ip + 4;
 }
 
-void EndProc(Kernel kInstance)
+void EndProc(Kernel k)
 {
-    //tt        System.out.println("EndProc");
-    //tt        printStack();
+    // tt        System.out.println("EndProc");
+    // tt        printStack();
 
-    if (kInstance->memory[kInstance->bp + 4] != 0)
+    if (k->memory[k->bp + 4] != 0)
     {
-        kInstance->ip = kInstance->memory[kInstance->bp + 4];
-        kInstance->pe = kInstance->memory[kInstance->bp + 3];
-        kInstance->sp = kInstance->memory[kInstance->bp + 2];
-        kInstance->bp = kInstance->memory[kInstance->bp + 1];
+        k->ip = k->memory[k->bp + 4];
+        k->pe = k->memory[k->bp + 3];
+        k->sp = k->memory[k->bp + 2];
+        k->bp = k->memory[k->bp + 1];
     }
-    //t        printStack();
+    // t        printStack();
 }
 /** instance: op  steps
-    *
-    *           Variable stack (before)
-    *           ----------------------
-    *   A       |   X                | <-- sp
-    *           ----------------------
-    *   A+1     |                    |
-    *           ----------------------
-    *
-    *           Variable stack (after)
-    *           ----------------------
-    *   A       |   X                |
-    *           ----------------------
-    *   A+1     |   link             | <-- sp
-    *           ----------------------
-    */
-void Instance(Kernel kInstance)
+ *
+ *           Variable stack (before)
+ *           ----------------------
+ *   A       |   X                | <-- sp
+ *           ----------------------
+ *   A+1     |                    |
+ *           ----------------------
+ *
+ *           Variable stack (after)
+ *           ----------------------
+ *   A       |   X                |
+ *           ----------------------
+ *   A+1     |   link             | <-- sp
+ *           ----------------------
+ */
+void Instance(Kernel k)
 {
-    int8_t steps = kInstance->memory[kInstance->ip];
-    int8_t link = kInstance->bp;
-    for (int i = steps; i > 0; i--)
+    int8_t steps = k->memory[k->ip];
+    int8_t link = k->bp;
+    for (int8_t i = steps; i > 0; i--)
     {
-        link = kInstance->memory[link];
+        link = k->memory[link];
     }
-    kInstance->sp = kInstance->sp + 1;
-    kInstance->memory[kInstance->sp] = link;
-    kInstance->ip = kInstance->ip + 1;
+    k->sp = k->sp + 1;
+    k->memory[k->sp] = link;
+    k->ip = k->ip + 1;
 }
 /** var: op Displacement
-    *
-    *           Variable stack (before)
-    *           ---------------------
-    *   A       | Link              | <-- sp
-    *           ---------------------
-    *   A+1     |                   |
-    *           ---------------------
-    *
-    *           Variable stack (after)
-    *           ---------------------
-    *   A       | Link + disp       | <-- sp
-    *           ---------------------
-    *   A+1     |                   |
-    *           ---------------------
-    */
-void Variable(Kernel kInstance)
+ *
+ *           Variable stack (before)
+ *           ---------------------
+ *   A       | Link              | <-- sp
+ *           ---------------------
+ *   A+1     |                   |
+ *           ---------------------
+ *
+ *           Variable stack (after)
+ *           ---------------------
+ *   A       | Link + disp       | <-- sp
+ *           ---------------------
+ *   A+1     |                   |
+ *           ---------------------
+ */
+void Variable(Kernel k)
 {
-    int8_t displ = kInstance->memory[kInstance->ip];
-    kInstance->memory[kInstance->sp] = kInstance->memory[kInstance->sp] + displ;
-    kInstance->ip = kInstance->ip + 1;
+    int8_t displ = k->memory[k->ip];
+    k->memory[k->sp] = k->memory[k->sp] + displ;
+    k->ip = k->ip + 1;
 }
 
 /** construct: op  number, lineNo
-    *
-    *           Variable stack (before)
-    *           ---------------------
-    *   A       |   X0              | <-- sp
-    *           ---------------------
-    *   A+1     |   X1              |
-    *           ---------------------
-    *                ..........
-    *           ---------------------
-    *   A+n     |   Xn              |
-    *           ---------------------
-    *
-    *           Variable stack (after)
-    *           ---------------------
-    *   A       |   S0              |
-    *           ---------------------
-    *   A+1     |   S2              |
-    *           ---------------------
-    *                ..........
-    *           ---------------------
-    *   A+m     |   Sm              | <-- sp
-    *           ---------------------
-    *             n = number - 1
-    *             m = SET_LENGTH - 1
-    */
-void Construct(Kernel kInstance)
+ *
+ *           Variable stack (before)
+ *           ---------------------
+ *   A       |   X0              | <-- sp
+ *           ---------------------
+ *   A+1     |   X1              |
+ *           ---------------------
+ *                ..........
+ *           ---------------------
+ *   A+n     |   Xn              |
+ *           ---------------------
+ *
+ *           Variable stack (after)
+ *           ---------------------
+ *   A       |   S0              |
+ *           ---------------------
+ *   A+1     |   S2              |
+ *           ---------------------
+ *                ..........
+ *           ---------------------
+ *   A+m     |   Sm              | <-- sp
+ *           ---------------------
+ *             n = number - 1
+ *             m = SET_LENGTH - 1
+ */
+void Construct(Kernel k)
 {
-    int8_t number = kInstance->memory[kInstance->ip];
-    int8_t elem, index, i, val;
-    int8_t *tempSet = (int8_t*)malloc(sizeof(int8_t) * SET_LENGTH);
-
-    //t     printf("Set number = %d\n", number);
-    for (i = 0; i < SET_LENGTH; i++)
+    int8_t number = k->memory[k->ip];
+    uint16_t elem, index, i, val;
+    uint16_t *tempSet = (uint16_t*) malloc(k->SET_LENGTH*sizeof(int16_t));
+    // t     PutS("Set number = %d\n", number);
+    for (i = 0; i < k->SET_LENGTH; i++)
         tempSet[i] = 0;
 
     for (i = 0; i < number; i++)
     {
-        elem = kInstance->memory[kInstance->sp - i];
-        if ((elem >= 0) && (elem <= SET_LIMIT))
+        elem = k->memory[k->sp - i];
+        if ((elem >= 0) && (elem <= k->SET_LIMIT))
         {
-            index = elem & (SET_LENGTH - 1);
+            index = elem & (k->SET_LENGTH - 1);
             val = elem >> 3;
 
             tempSet[index] |= (1 << val);
         }
         else
-            // printf("Error: element has the value outside set range\n");
             PutS("Error: element has the value outside set range\n");
     }
-    kInstance->sp = kInstance->sp - number + 1;
-    for (i = 0; i < SET_LENGTH; i++)
+    k->sp = k->sp - number + 1;
+    for (i = 0; i < k->SET_LENGTH; i++)
     {
-        kInstance->memory[kInstance->sp + i] = tempSet[i];
+      k->memory[k->sp + i] = tempSet[i];
     }
-    kInstance->sp = kInstance->sp + SET_LENGTH - 1;
-    kInstance->ip = kInstance->ip + 2;
+    k->sp = k->sp + k->SET_LENGTH - 1;
+    k->ip = k->ip + 2;
 }
 
 /** constant: op value
-    *
-    *           Variable stack (before)
-    *           ---------------------
-    *   A       | X                 | <-- sp
-    *           ---------------------
-    *   A+1     |                   |
-    *           ---------------------
-    *
-    *           Variable stack (after)
-    *           ---------------------
-    *   A       | X                 |
-    *           ---------------------
-    *   A+1     | value             | <-- sp
-    *           ---------------------
-    */
-void Constant(Kernel kInstance)
+ *
+ *           Variable stack (before)
+ *           ---------------------
+ *   A       | X                 | <-- sp
+ *           ---------------------
+ *   A+1     |                   |
+ *           ---------------------
+ *
+ *           Variable stack (after)
+ *           ---------------------
+ *   A       | X                 |
+ *           ---------------------
+ *   A+1     | value             | <-- sp
+ *           ---------------------
+ */
+void Constant(Kernel k)
 {
-    int value = kInstance->memory[kInstance->ip];
-    kInstance->sp = kInstance->sp + 1;
-    kInstance->memory[kInstance->sp] = value;
-    kInstance->ip = kInstance->ip + 1;
+    int8_t value = k->memory[k->ip];
+    k->sp = k->sp + 1;
+    k->memory[k->sp] = value;
+    k->ip = k->ip + 1;
 }
 
 /** value: op length
-    *
-    *           Variable stack (before)
-    *           ---------------------
-    *   A       | link + displ      | <-- sp
-    *           ---------------------
-    *   A+1     |                   |
-    *           ---------------------
-    *
-    *           Variable stack (after)
-    *           ---------------------
-    *   A       | value             |
-    *           ---------------------
-    *   A+1     | value1            |
-    *           ---------------------
-    *               ............
-    *           ---------------------
-    *   A+n     | valuen            | <-- sp
-    *           ---------------------
-    *             n = length-1
-    */
-void Value(Kernel kInstance)
+ *
+ *           Variable stack (before)
+ *           ---------------------
+ *   A       | link + displ      | <-- sp
+ *           ---------------------
+ *   A+1     |                   |
+ *           ---------------------
+ *
+ *           Variable stack (after)
+ *           ---------------------
+ *   A       | value             |
+ *           ---------------------
+ *   A+1     | value1            |
+ *           ---------------------
+ *               ............
+ *           ---------------------
+ *   A+n     | valuen            | <-- sp
+ *           ---------------------
+ *             n = length-1
+ */
+void Value(Kernel k)
 {
-    int length = kInstance->memory[kInstance->ip];
-    int varAdd = kInstance->memory[kInstance->sp];
+    int8_t length = k->memory[k->ip];
+    int8_t varAdd = k->memory[k->sp];
 
-    for (int i = 0; i < length; i++)
+    for (int8_t i = 0; i < length; i++)
     {
-        kInstance->memory[kInstance->sp + i] = kInstance->memory[varAdd + i];
+        k->memory[k->sp + i] = k->memory[varAdd + i];
     }
-    kInstance->sp = kInstance->sp + length - 1;
-    kInstance->ip = kInstance->ip + 1;
+    k->sp = k->sp + length - 1;
+    k->ip = k->ip + 1;
 }
 
 /** valSpace: op length
-    *
-    *           Variable stack (before)
-    *           ---------------------
-    *   A       | X                 | <-- sp
-    *           ---------------------
-    *   A+1     |                               |
-    *           ---------------------
-    *
-    *           Variable stack (after)
-    *           ---------------------
-    *   A       | X                 |
-    *           ---------------------
-    *   A+1     | ?                 |
-    *           ---------------------
-    *                ............
-    *           ---------------------
-    *   A+n     | ?                 | <-- sp
-    *           ---------------------
-    *               n = length
-    */
-void ValSpace(Kernel kInstance)
+ *
+ *           Variable stack (before)
+ *           ---------------------
+ *   A       | X                 | <-- sp
+ *           ---------------------
+ *   A+1     |                               |
+ *           ---------------------
+ *
+ *           Variable stack (after)
+ *           ---------------------
+ *   A       | X                 |
+ *           ---------------------
+ *   A+1     | ?                 |
+ *           ---------------------
+ *                ............
+ *           ---------------------
+ *   A+n     | ?                 | <-- sp
+ *           ---------------------
+ *               n = length
+ */
+void ValSpace(Kernel k)
 {
-    int length = kInstance->memory[kInstance->ip];
-    kInstance->sp = kInstance->sp + length;
-    kInstance->ip = kInstance->ip + 1;
+    int8_t length = k->memory[k->ip];
+    k->sp = k->sp + length;
+    k->ip = k->ip + 1;
 }
 
 // Not: r = ~v    before: [v, ...    after:  [r, ...
-void Not(Kernel kInstance)
+void Not(Kernel k)
 {
-    kInstance->memory[kInstance->sp] = ~kInstance->memory[kInstance->sp];
+    k->memory[k->sp] = ~k->memory[k->sp];
 }
 
 // Mul: r = v1 * v2    before: [v1, v2, ...    after:  [r, ...
-void Mul(Kernel kInstance)
+void Mul(Kernel k)
 {
-    kInstance->v2 = kInstance-> memory[kInstance->sp--];
-    kInstance->memory[kInstance->sp] = kInstance->memory[kInstance->sp] * kInstance->v2;
+    k->v2 = k->memory[k->sp--];
+    k->memory[k->sp] = k->memory[k->sp] * k->v2;
 
-    kInstance->lineNo = kInstance->memory[kInstance->ip++];
+    k->lineNo = k->memory[k->ip++];
 }
 // Div: r = v1 / v2    before: [v1, v2, ...    after:  [r, ...
-void Div(Kernel kInstance)
+void Div(Kernel k)
 {
-    kInstance->v2 = kInstance->memory[kInstance->sp--];
-    if (kInstance->v2 == 0)
-        runError("division by zero", kInstance);
-    kInstance->v1 = kInstance->memory[kInstance->sp];
-    kInstance->memory[kInstance->sp] = kInstance->v1 / kInstance->v2;
+    k->v2 = k->memory[k->sp--];
+    if (k->v2 == 0)
+        runError("division by zero");
+    k->v1 = k->memory[k->sp];
+    k->memory[k->sp] = k->v1 / k->v2;
 
-    kInstance->lineNo = kInstance->memory[kInstance->ip++];
+    k->lineNo = k->memory[k->ip++];
 }
 
 // Mod: r = v1 % v2    before: [v1, v2, ...    after:  [r, ...
-void Mod(Kernel kInstance)
+void Mod(Kernel k)
 {
-    kInstance->v2 = kInstance->memory[kInstance->sp--];
-    if (kInstance->v2 == 0)
-        runError("modulus by zero", kInstance);
-    kInstance->v1 = kInstance->memory[kInstance->sp];
-    kInstance->memory[kInstance->sp] = kInstance->v1 % kInstance->v2;
+    k->v2 = k->memory[k->sp--];
+    if (k->v2 == 0)
+        runError("modulus by zero");
+    k->v1 = k->memory[k->sp];
+    k->memory[k->sp] = k->v1 % k->v2;
 
-    kInstance->lineNo = kInstance->memory[kInstance->ip++];
+    k->lineNo = k->memory[k->ip++];
 }
 
 // And: r = v1 & v2    before: [v1, v2, ...    after:  [r, ...
-void And(Kernel kInstance)
+void And(Kernel k)
 {
-    kInstance->v2 = kInstance->memory[kInstance->sp--];
-    kInstance->memory[kInstance->sp] = kInstance->memory[kInstance->sp] & kInstance->v2;
+    k->v2 = k->memory[k->sp--];
+    k->memory[k->sp] = k->memory[k->sp] & k->v2;
 }
 
 // Neg: r = -v         before: [v, ...         after:  [r, ...
-void Neg(Kernel kInstance)
+void Neg(Kernel k)
 {
-    kInstance->memory[kInstance->sp] = -kInstance->memory[kInstance->sp];
-    kInstance->ip = kInstance->ip + 1;
+    k->memory[k->sp] = -k->memory[k->sp];
+    k->ip = k->ip + 1;
 }
 
 // Add: r = v1 + v2    before: [v1, v2, ...    after:  [r, ...
-void Add(Kernel kInstance)
+void Add(Kernel k)
 {
-    kInstance->v2 = kInstance->memory[kInstance->sp--];
-    kInstance->memory[kInstance->sp] += kInstance->v2;
+    k->v2 = k->memory[k->sp--];
+    k->memory[k->sp] += k->v2;
 
-    kInstance->lineNo = kInstance->memory[kInstance->ip++];
+    k->lineNo = k->memory[k->ip++];
 }
 
 // Sub: r = v1 - v2    before: [v1, v2, ...    after:  [r, ...
-void Subtract(Kernel kInstance)
+void Subtract(Kernel k)
 {
-    kInstance->v2 = kInstance->memory[kInstance->sp--];
-    kInstance->memory[kInstance->sp] -= kInstance->v2;
+    k->v2 = k->memory[k->sp--];
+    k->memory[k->sp] -= k->v2;
 
-    kInstance->lineNo = kInstance->memory[kInstance->ip++];
+    k->lineNo = k->memory[k->ip++];
 }
 
 // Or: r = v1 | v2     before: [v1, v2, ...    after:  [r, ...
-void Or(Kernel kInstance)
+void Or(Kernel k)
 {
-    kInstance->v2 = kInstance->memory[kInstance->sp--];
-    kInstance->memory[kInstance->sp] |= kInstance->v2;
+    k->v2 = k->memory[k->sp--];
+    k->memory[k->sp] |= k->v2;
 }
 /** equal: op length
-    *
-    *           Variable stack (before)
-    *           --------------------------
-    *   A       | X                      |
-    *           --------------------------
-    *   A+1     | X1                     |
-    *           --------------------------
-    *               ..................
-    *           --------------------------
-    *   A+n     |   Xn                   |
-    *           --------------------------
-    *   A+n     |   Y                    |
-    *    +1     --------------------------
-    *   A+n     |   Y+1                  |
-    *    +2     --------------------------
-    *                .................
-    *           --------------------------
-    *   A+2n    |   Y+n                  | <-- sp
-    *    +1     --------------------------
-    *
-    *           Variable stack (after)
-    *           --------------------------
-    *   A       | 1 if(X=Y) - 0 if (X!=Y)| <-- sp
-    *           --------------------------
-    *   A+1     |   X1                   |
-    *           --------------------------
-    *               ..................
-    *           --------------------------
-    *   A+n     |   Xn                   |
-    *           --------------------------
-    *   A+n     |   Y                    |
-    *    +1     --------------------------
-    *   A+n     |   Y+1                  |
-    *    +2     --------------------------
-    *                 .................
-    *           --------------------------
-    *   A+2n    |   Y+n                  |
-    *    +1     --------------------------
-    *
-    *           n = length - 1
-    */
-void Equal(Kernel kInstance)
+ *
+ *           Variable stack (before)
+ *           --------------------------
+ *   A       | X                      |
+ *           --------------------------
+ *   A+1     | X1                     |
+ *           --------------------------
+ *               ..................
+ *           --------------------------
+ *   A+n     |   Xn                   |
+ *           --------------------------
+ *   A+n     |   Y                    |
+ *    +1     --------------------------
+ *   A+n     |   Y+1                  |
+ *    +2     --------------------------
+ *                .................
+ *           --------------------------
+ *   A+2n    |   Y+n                  | <-- sp
+ *    +1     --------------------------
+ *
+ *           Variable stack (after)
+ *           --------------------------
+ *   A       | 1 if(X=Y) - 0 if (X!=Y)| <-- sp
+ *           --------------------------
+ *   A+1     |   X1                   |
+ *           --------------------------
+ *               ..................
+ *           --------------------------
+ *   A+n     |   Xn                   |
+ *           --------------------------
+ *   A+n     |   Y                    |
+ *    +1     --------------------------
+ *   A+n     |   Y+1                  |
+ *    +2     --------------------------
+ *                 .................
+ *           --------------------------
+ *   A+2n    |   Y+n                  |
+ *    +1     --------------------------
+ *
+ *           n = length - 1
+ */
+void Equal(Kernel k)
 {
-    int length = kInstance->memory[kInstance->ip];
-    int y = kInstance->sp - length + 1;
-    int x = y - length;
-    kInstance->sp = x;
+    int8_t length = k->memory[k->ip];
+    int8_t y = k->sp - length + 1;
+    int8_t x = y - length;
+    k->sp = x;
     bool equal = true;
-    for (int i = 0; i < length; i++)
+    for (int8_t i = 0; i < length; i++)
     {
-        if (kInstance->memory[x + i] != kInstance->memory[y + i])
+        if (k->memory[x + i] != k->memory[y + i])
         {
             equal = false;
             break;
         }
     }
-    kInstance->ip = kInstance->ip + 1;
+    k->ip = k->ip + 1;
     if (equal)
-        kInstance->memory[kInstance->sp] = 1;
+       k->memory[k->sp] = 1;
     else
-        kInstance->memory[kInstance->sp] = 0;
+        k->memory[k->sp] = 0;
 }
 /** not equal: op length
-    *
-    *           Variable stack (before)
-    *           --------------------------
-    *   A       | X                      |
-    *           --------------------------
-    *   A+1     | X1                     |
-    *           --------------------------
-    *               ..................
-    *           --------------------------
-    *   A+n     |   Xn                   |
-    *           --------------------------
-    *   A+n     |   Y                    |
-    *    +1     --------------------------
-    *   A+n     |   Y+1                  |
-    *    +2     --------------------------
-    *               .................
-    *           --------------------------
-    *   A+2n    |   Y+n                  | <-- sp
-    *    +1     --------------------------
-    *
-    *           Variable stack (after)
-    *           --------------------------
-    *   A       | 0 if(X=Y) - 1 if (X!=Y)| <-- sp
-    *           --------------------------
-    *   A+1     |   X1                   |
-    *           --------------------------
-    *               ..................
-    *           --------------------------
-    *   A+n     |   Xn                   |
-    *           --------------------------
-    *   A+n     |   Y                    |
-    *    +1     --------------------------
-    *   A+n     |   Y+1                  |
-    *    +2     --------------------------
-    *                 .................
-    *           --------------------------
-    *   A+2n    |   Y+n                  | <-- sp
-    *    +1     --------------------------
-    *
-    *           n = length - 1
-    */
-void NotEqual(Kernel kInstance)
+ *
+ *           Variable stack (before)
+ *           --------------------------
+ *   A       | X                      |
+ *           --------------------------
+ *   A+1     | X1                     |
+ *           --------------------------
+ *               ..................
+ *           --------------------------
+ *   A+n     |   Xn                   |
+ *           --------------------------
+ *   A+n     |   Y                    |
+ *    +1     --------------------------
+ *   A+n     |   Y+1                  |
+ *    +2     --------------------------
+ *               .................
+ *           --------------------------
+ *   A+2n    |   Y+n                  | <-- sp
+ *    +1     --------------------------
+ *
+ *           Variable stack (after)
+ *           --------------------------
+ *   A       | 0 if(X=Y) - 1 if (X!=Y)| <-- sp
+ *           --------------------------
+ *   A+1     |   X1                   |
+ *           --------------------------
+ *               ..................
+ *           --------------------------
+ *   A+n     |   Xn                   |
+ *           --------------------------
+ *   A+n     |   Y                    |
+ *    +1     --------------------------
+ *   A+n     |   Y+1                  |
+ *    +2     --------------------------
+ *                 .................
+ *           --------------------------
+ *   A+2n    |   Y+n                  | <-- sp
+ *    +1     --------------------------
+ *
+ *           n = length - 1
+ */
+void NotEqual(Kernel k)
 {
-    int length = kInstance->memory[kInstance->ip];
-    int y = kInstance->sp - length + 1;
-    int x = kInstance->sp - length;
-    kInstance->sp = x;
+    int8_t length = k->memory[k->ip];
+    int8_t y = k->sp - length + 1;
+    int8_t x = k->sp - length;
+    k->sp = x;
 
-    kInstance->memory[kInstance->sp] = 0;
-    for (int i = 0; i < length; i++)
+    k->memory[k->sp] = 0;
+    for (int8_t i = 0; i < length; i++)
     {
-        if (kInstance->memory[x + i] != kInstance->memory[y + i])
+        if (k->memory[x + i] != k->memory[y + i])
         {
-            kInstance->memory[kInstance->sp] = 1;
+            k->memory[k->sp] = 1;
             break;
         }
     }
-    kInstance->ip = kInstance->ip + 1;
+    k->ip = k->ip + 1;
 }
 
 // TestForLessThan: r = v1 < v2    before: [v1, v2, ...    after:  [r, ...
-void TestForLessThan(Kernel kInstance)
+void TestForLessThan(Kernel k)
 {
-    kInstance->v2 = kInstance->memory[kInstance->sp--];
-    kInstance->memory[kInstance->sp] = (kInstance->memory[kInstance->sp] < kInstance->v2) ? 1 : 0;
+    k->v2 = k->memory[k->sp--];
+    k->memory[k->sp] = (k->memory[k->sp] < k->v2) ? 1 : 0;
 }
 
 // TestForGreaterOrEqual: r = v1 >= v2    before: [v1, v2, ...    after:  [r, ...
-void TestForGreaterOrEqual(Kernel kInstance)
+void TestForGreaterOrEqual(Kernel k)
 {
-    kInstance->v2 = kInstance->memory[kInstance->sp--];
-    kInstance->memory[kInstance->sp] = (kInstance->memory[kInstance->sp] >= kInstance->v2) ? 1 : 0;
+    k->v2 = k->memory[k->sp--];
+    k->memory[k->sp] = (k->memory[k->sp] >= k->v2) ? 1 : 0;
 }
 
 // TestForGreater: r = v1 >= v2    before: [v1, v2, ...    after:  [r, ...
-void TestForGreater(Kernel kInstance)
+void TestForGreater(Kernel k)
 {
-    kInstance->v2 = kInstance->memory[kInstance->sp--];
-    kInstance->memory[kInstance->sp] = (kInstance->memory[kInstance->sp] > kInstance->v2) ? 1 : 0;
+    k->v2 = k->memory[k->sp--];
+    k->memory[k->sp] = (k->memory[k->sp] > k->v2) ? 1 : 0;
 }
 
 // TestForGreaterOrEqual: r = v1 <= v2    before: [v1, v2, ...    after:  [r, ...
-void TestForLessOrEqual(Kernel kInstance)
+void TestForLessOrEqual(Kernel k)
 {
-    kInstance->v2 = kInstance->memory[kInstance->sp--];
-    kInstance->memory[kInstance->sp] = (kInstance->memory[kInstance->sp] <= kInstance->v2) ? 1 : 0;
+    k->v2 = k->memory[k->sp--];
+    k->memory[k->sp] = (k->memory[k->sp] <= k->v2) ? 1 : 0;
 }
 
 /** *========================================
-    *   Assigment_statement: Variable_symbol Expression ASSIGN
-    *========================================
+ *   Assigment_statement: Variable_symbol Expression ASSIGN
+ *========================================
     *
     *           Program
     *           --------------------------
@@ -602,27 +695,27 @@ void TestForLessOrEqual(Kernel kInstance)
     *           --------------------------
     *               n = length
     */
-void Assign(Kernel kInstance)
+void Assign(Kernel k)
 {
-    int8_t length = kInstance->memory[kInstance->ip];
-    kInstance->sp = kInstance->sp - length - 1;
-    int8_t x = kInstance->memory[kInstance->sp + 1];
-    int8_t y = kInstance->sp + 2;
-    for (int i = 0; i < length; i++)
+    int8_t length = k->memory[k->ip];
+    k->sp = k->sp - length - 1;
+    int8_t x = k->memory[k->sp + 1];
+    int8_t y = k->sp + 2;
+    for (int8_t i = 0; i < length; i++)
     {
-        kInstance->memory[x + i] = kInstance->memory[y + i];
+        k->memory[x + i] = k->memory[y + i];
     }
-    kInstance->ip = kInstance->ip + 1;
+    k->ip = k->ip + 1;
 }
 
 /** ====================================================
-    *   Argument      = Expression | Variable_symbol | Procedure_argument
-    *   Argument_list = Argument {Argument}
-    *   Procedure_call
-    *       Standard_call |
-    *       [Argument_list] Instance ProcCall
-    *       [Argument_list] Instance ParamCall
-    *=====================================================
+ *   Argument      = Expression | Variable_symbol | Procedure_argument
+ *   Argument_list = Argument {Argument}
+ *   Procedure_call
+ *       Standard_call |
+ *       [Argument_list] Instance ProcCall
+ *       [Argument_list] Instance ParamCall
+ *=====================================================
     *           Program
     *           --------------------------
     *           |   ProcCallOpcode       |
@@ -658,765 +751,505 @@ void Assign(Kernel kInstance)
     *           --------------------------
     */
 
-void ProcCall(Kernel kInstance)
+void ProcCall(Kernel k)
 {
-    int8_t displacement = kInstance->memory[kInstance->ip];
-    //t         printStack();
+    int8_t displacement = k->memory[k->ip];
+    // t         printStack();
 
-    kInstance->memory[kInstance->sp + 1] = kInstance->bp;
-    kInstance->memory[kInstance->sp + 3] = kInstance->pe;
-    kInstance->memory[kInstance->sp + 4] = kInstance->ip + 1; // next instruction
-    kInstance->bp = kInstance->sp;
-    kInstance->sp = kInstance->sp + 4;
-    kInstance->ip = kInstance->ip + displacement - 1;
-    //t         printStack();
+    k->memory[k->sp + 1] = k->bp;
+    k->memory[k->sp + 3] = k->pe;
+    k->memory[k->sp + 4] = k->ip + 1; // next instruction
+    k->bp = k->sp;
+    k->sp = k->sp + 4;
+    k->ip = k->ip + displacement - 1;
+    // t         printStack();
 }
 
-void ProcArg(Kernel kInstance)
+void ProcArg(Kernel k)
 {
-    int displacement = kInstance->memory[kInstance->ip++];
-    //t        printStack();
-    kInstance->memory[++kInstance->sp] = displacement;
-    //t        printStack();
+    int8_t displacement = k->memory[k->ip++];
+    // t        printStack();
+    k->memory[++k->sp] = displacement;
+    // t        printStack();
 }
 
-void printStack(Kernel kInstance)
+void printStack(Kernel k)
 {
-    // printf("ip=%02x [", kInstance->ip - 1024);
-    // PutS("ip=");
-    // PutS((char)(kInstance->ip - 1024));
-    // PutS(" [");
-    for (uint8_t n = 0; n < 8; n++)
+    PutS("ip=");
+    uint16_t n = k->ip - 1024;
+    PutX16(n);
+    PutS(" [");
+    // PutS("ip=%02x [", ip - 1024);
+    for (int8_t n = 0; n < 8; n++)
     {
-        // printf("%02x, ", kInstance->memory[kInstance->sp + n]);
-        // PutS((char)(kInstance->memory[kInstance->sp + n]));
-        // PutS(", ");
+        PutX16(k->memory[k->sp + n]);
+        PutS(", ");
+        // PutS("%02x, ", memory[sp + n]);
     }
-    // PutS("...\n");
-    // printf("...\n");
+    PutS("...\n");
 }
-void ParamCall(Kernel kInstance)
+void ParamCall(Kernel k)
 {
-    //t        printStack();
-    int8_t displacement = kInstance->memory[kInstance->ip];
-    int addr = kInstance->memory[kInstance->sp] + displacement;
-    int dest = kInstance->memory[addr + 1];
+    // t        printStack();
+    int8_t displacement = k->memory[k->ip];
+    int8_t addr = k->memory[k->sp] + displacement;
+    int8_t dest = k->memory[addr + 1];
 
-    //t        printStack();
+    // t        printStack();
 
-    kInstance->memory[kInstance->sp] = kInstance->memory[addr];
-    kInstance->memory[kInstance->sp + 1] = kInstance->bp;
-    kInstance->memory[kInstance->sp + 3] = kInstance->pe;
-    kInstance->memory[kInstance->sp + 4] = kInstance->ip + 1; // next instruction
-    kInstance->bp = kInstance->sp;
-    kInstance->sp = kInstance->sp + 4;
-    kInstance->ip = dest;
+    k->memory[k->sp] = k->memory[addr];
+    k->memory[k->sp + 1] = k->bp;
+    k->memory[k->sp + 3] = k->pe;
+    k->memory[k->sp + 4] = k->ip + 1; // next instruction
+    k->bp = k->sp;
+    k->sp = k->sp + 4;
+    k->ip = dest;
     //        printStack();
 }
 
 /** =====================================================
-    *   Conditional_statement = [Expression Do] Statement_list [Else]
-    *   Conditional_statement_list = Conditional_statement {Conditinal_statement}
-    * =====================================================
-    *           Program
-    *           --------------------------
-    *           |   DoOpcode             |
-    *           --------------------------
-    *           |   displacement         | <-- ip
-    *           --------------------------
-    *
-    *           Variable stack (before)
-    *           --------------------------
-    *   A       |   X                    |
-    *           --------------------------
-    *   A+1     |   (0,1)                | <-- sp
-    *           --------------------------
-    *
-    *           Variable stack (after)
-    *           --------------------------
-    *   A       |   X                    | <-- sp
-    *           --------------------------
-    *   A+1     |   (0,1)                |
-    *           --------------------------
-    */
-void Do(Kernel kInstance)
+ *   Conditional_statement = [Expression Do] Statement_list [Else]
+ *   Conditional_statement_list = Conditional_statement {Conditinal_statement}
+ * =====================================================
+ *           Program
+ *           --------------------------
+ *           |   DoOpcode             |
+ *           --------------------------
+ *           |   displacement         | <-- ip
+ *           --------------------------
+ *
+ *           Variable stack (before)
+ *           --------------------------
+ *   A       |   X                    |
+ *           --------------------------
+ *   A+1     |   (0,1)                | <-- sp
+ *           --------------------------
+ *
+ *           Variable stack (after)
+ *           --------------------------
+ *   A       |   X                    | <-- sp
+ *           --------------------------
+ *   A+1     |   (0,1)                |
+ *           --------------------------
+ */
+void Do(Kernel k)
 {
-    int8_t displacement = kInstance->memory[kInstance->ip];
-    if (kInstance->memory[kInstance->sp] == 1)
-        kInstance->ip++;
+    int8_t displacement = k->memory[k->ip];
+    if (k->memory[k->sp] == 1)
+        k->ip++;
     else
-        kInstance->ip = kInstance->ip + displacement - 1;
-    kInstance->sp--;
+        k->ip = k->ip + displacement - 1;
+    k->sp--;
 }
 
 /**
-    *           Program
-    *           --------------------------
-    *           |   ElseOpcode           |
-    *           --------------------------
-    *           |   displacement         | <-- ip
-    *           --------------------------
-    */
-void Else(Kernel kInstance)
+ *           Program
+ *           --------------------------
+ *           |   ElseOpcode           |
+ *           --------------------------
+ *           |   displacement         | <-- ip
+ *           --------------------------
+ */
+void Else(Kernel k)
 {
-    int8_t displacement = kInstance->memory[kInstance->ip];
-    kInstance->ip = kInstance->ip + displacement - 1;
+    int8_t displacement = k->memory[k->ip];
+    k->ip = k->ip + displacement - 1;
 }
 
 /** =====================================================
-    *   if_statement = conditional_statement_list
-    *   while_statement
-    *           conditional_statement_list
-    *   when_statement =
-    *           When conditional_statement_list Wait Endwhen
-    * =====================================================
-    *           Program
-    *           --------------------------
-    *           |   WhenOpcode           |
-    *           --------------------------
-    *           |                        | <-- ip
-    *           --------------------------
-    */
-void When()
+ *   if_statement = conditional_statement_list
+ *   while_statement
+ *           conditional_statement_list
+ *   when_statement =
+ *           When conditional_statement_list Wait Endwhen
+ * =====================================================
+ *           Program
+ *           --------------------------
+ *           |   WhenOpcode           |
+ *           --------------------------
+ *           |                        | <-- ip
+ *           --------------------------
+ */
+void When(Kernel k)
 {
-    //do nothing
+    // do nothing
 }
 
 /**
-    *           Program
-    *           --------------------------
-    *           |   WaitOpcode           |
-    *           --------------------------
-    *           |   displacement         | <-- ip
-    *           --------------------------
-    */
-void Wait(Kernel kInstance)
+ *           Program
+ *           --------------------------
+ *           |   WaitOpcode           |
+ *           --------------------------
+ *           |   displacement         | <-- ip
+ *           --------------------------
+ */
+void Wait(Kernel k)
 {
-    int8_t displacement = kInstance->memory[kInstance->ip];
-    kInstance->ip = kInstance->ip + displacement - 1;
-    preempt(kInstance);
-    if (kInstance->taskCurrent >= (kInstance->numberOfTasks - 1))
-        kInstance->taskCurrent = 0;
+    int8_t displacement = k->memory[k->ip];
+    k->ip = k->ip + displacement - 1;
+    preempt(k);
+    if (k->taskCurrent >= (k->numberOfTasks - 1))
+        k->taskCurrent = 0;
     else
-        kInstance->taskCurrent++;
-    resume(kInstance);
+        k->taskCurrent++;
+    resume(k);
 }
 
 /**
-    *           Program
-    *           --------------------------
-    *           |   EndWhenOpcode        |
-    *           --------------------------
-    *           |                        | <-- ip
-    *           --------------------------
-    */
-void EndWhen()
+ *           Program
+ *           --------------------------
+ *           |   EndWhenOpcode        |
+ *           --------------------------
+ *           |                        | <-- ip
+ *           --------------------------
+ */
+void EndWhen(Kernel k)
 {
-    //do nothing
+    // do nothing
 }
 
 /** =====================================================
-    *   Process_statement = Process statement_list Also
-    * =====================================================
-    *           Program
-    *           --------------------------
-    *           |   ProcessOpcode        |
-    *           --------------------------
-    *           |   tempLength           | <-- ip
-    *           --------------------------
-    *           |   lineNo               |
-    *           --------------------------
-    */
-void Process(Kernel kInstance)
+ *   Process_statement = Process statement_list Also
+ * =====================================================
+ *           Program
+ *           --------------------------
+ *           |   ProcessOpcode        |
+ *           --------------------------
+ *           |   tempLength           | <-- ip
+ *           --------------------------
+ *           |   lineNo               |
+ *           --------------------------
+ */
+void Process(Kernel k)
 {
-    int tempLength = kInstance->memory[kInstance->ip];
-    kInstance->lineNo = kInstance->memory[kInstance->ip + 1];
+    int8_t tempLength = k->memory[k->ip];
+    k->lineNo = k->memory[k->ip + 1];
 
-    if ((kInstance->sp + tempLength) > kInstance->pe)
+    if ((k->sp + tempLength) > k->pe)
     {
-        runError("Not enough memory to run a process sp", kInstance);
+        runError("Not enough memory to run a process sp");
     }
-    kInstance->ip += 2;
+    k->ip += 2;
 }
 
 /**
-    *           Program
-    *           --------------------------
-    *           |   AlsoOpcode           |
-    *           --------------------------
-    *           |   displacement         | <-- ip
-    *           --------------------------
-    */
-void Also(Kernel kInstance)
+ *           Program
+ *           --------------------------
+ *           |   AlsoOpcode           |
+ *           --------------------------
+ *           |   displacement         | <-- ip
+ *           --------------------------
+ */
+void Also(Kernel k)
 {
-    int8_t displacement = kInstance->memory[kInstance->ip];
-    if (kInstance->numberOfTasks > 1)
+    int8_t displacement = k->memory[k->ip];
+    if (k->numberOfTasks > 1)
     {
-        while (kInstance->taskCurrent < (kInstance->numberOfTasks - 1))
+        while (k->taskCurrent < (k->numberOfTasks - 1))
         {
-            kInstance->taskQueue[kInstance->taskCurrent] = kInstance->taskQueue[kInstance->taskCurrent + 1];
-            kInstance->taskCurrent++;
+            k->taskQueue[k->taskCurrent] = k->taskQueue[k->taskCurrent + 1];
+            k->taskCurrent++;
         }
-        kInstance->numberOfTasks = kInstance->numberOfTasks - 1;
-        kInstance->taskCurrent = 0;
-        resume(kInstance);
+        k->numberOfTasks = k->numberOfTasks - 1;
+        k->taskCurrent = 0;
+        resume(k);
     }
     else
     { // numberOfTasks = 1
-        kInstance->sp = kInstance->taskStackTop;
-        kInstance->pe = kInstance->taskProgTop;
-        kInstance->ip = kInstance->ip + displacement - 1;
+        k->sp = k->taskStackTop;
+        k->pe = k->taskProgTop;
+        k->ip = k->ip + displacement - 1;
     }
 }
 
 /** =====================================================
-    *   Process_statement_list =  Process_statement {Process_statement}
-    *   Concurent_statement    =  Goto Process_statement_list Cobegin
-    * =====================================================
-    *           Program
-    *           --------------------------
-    *           |   CoBeginOpcode        |
-    *           --------------------------
-    *           |   numOfTask            | <-- ip
-    *           --------------------------
-    *           |   lineNo               |
-    *           --------------------------
-    *           |   process constant     |
-    *           --------------------------
-    *           |   displacement         |
-    *           --------------------------
-    *           |   process constant     |
-    *           --------------------------
-    *           |   displacement         |
-    *           --------------------------
-    *           |   lineNo               |
-    *           --------------------------
-    *               .................
-    *           --------------------------
-    *           |   lineNo               |
-    *           --------------------------
-    *           |   displacement         |
-    *           --------------------------
-    */
-void Cobegin(Kernel kInstance)
+ *   Process_statement_list =  Process_statement {Process_statement}
+ *   Concurent_statement    =  Goto Process_statement_list Cobegin
+ * =====================================================
+ *           Program
+ *           --------------------------
+ *           |   CoBeginOpcode        |
+ *           --------------------------
+ *           |   numOfTask            | <-- ip
+ *           --------------------------
+ *           |   lineNo               |
+ *           --------------------------
+ *           |   process constant     |
+ *           --------------------------
+ *           |   displacement         |
+ *           --------------------------
+ *           |   process constant     |
+ *           --------------------------
+ *           |   displacement         |
+ *           --------------------------
+ *           |   lineNo               |
+ *           --------------------------
+ *               .................
+ *           --------------------------
+ *           |   lineNo               |
+ *           --------------------------
+ *           |   displacement         |
+ *           --------------------------
+ */
+void Cobegin(Kernel k)
 {
-    int8_t numOfTask = kInstance->memory[kInstance->ip];
-    kInstance->lineNo = kInstance->memory[kInstance->ip + 1];
+    int8_t numOfTask = k->memory[k->ip];
+    k->lineNo = k->memory[k->ip + 1];
 
-    kInstance->numberOfTasks = numOfTask;
-    if (kInstance->numberOfTasks > MAX_QUEUE)
-        runError("Exceeds maximum number of processes", kInstance);
-    kInstance->taskStackTop = kInstance->sp;
-    kInstance->taskProgTop = kInstance->pe;
+    k->numberOfTasks = numOfTask;
+    if (k->numberOfTasks > k->MAX_QUEUE)
+        runError("Exceeds maximum number of processes");
+    k->taskStackTop = k->sp;
+    k->taskProgTop = k->pe;
 
-    int8_t length = (kInstance->pe - kInstance->sp) / numOfTask;
-    for (uint8_t i = 0; i < numOfTask; i++)
+    int8_t length = (k->pe - k->sp) / numOfTask;
+    for (int8_t i = 0; i < numOfTask; i++)
     {
-        kInstance->pe = kInstance->sp + length;
-        *kInstance->taskQueue[i] = createTask(MAX_QUEUE);
-
-        SetBp(*kInstance->taskQueue[i], kInstance->bp);
-        SetSp(*kInstance->taskQueue[i], kInstance->sp);
-        SetPe(*kInstance->taskQueue[i], kInstance->pe);
-        SetIp(*kInstance->taskQueue[i], kInstance->ip + kInstance->memory[kInstance->ip + i * 2 + 3] - 1);
-
-        kInstance->sp = kInstance->pe;
+        k->pe = k->sp + length;
+        k->taskQueue[i] = createTask(10);
+        Task current = k->taskQueue[i];
+        SetBp(current, k->bp);
+        SetSp(current, k->sp);
+        SetPe(current, k->pe);
+        SetIp(current, k->ip + k->memory[k->ip + i * 2 + 3] - 1);
+        k->sp = k->pe;
     }
-    kInstance->taskCurrent = 0;
-    resume(kInstance);
+    k->taskCurrent = 0;
+    resume(k);
 }
 
 /**         Program
-    *           -----------------
-    *           |   IndexOpcode |
-    *           -----------------
-    *           |   lower       | <-- ip
-    *           -----------------
-    *           | upper         |
-    *           -----------------
-    *           |   length      |
-    *           -----------------
-    *           |   lineNo      |
-    *           -----------------
-    *
-    *           Variable stack (before)
-    *           ------------------
-    *   A       | VariableAddress|
-    *           ------------------
-    *   A+1     |   Index        | <-- VI
-    *           ------------------
-    *
-    *           Variable stack (after)
-    *           ------------------
-    *   A       | IndexAddress   | <-- VI
-    *           ------------------
-    *   A+1     |                |
-    *           ------------------
-    */
-void Index(Kernel kInstance)
+ *           -----------------
+ *           |   IndexOpcode |
+ *           -----------------
+ *           |   lower       | <-- ip
+ *           -----------------
+ *           | upper         |
+ *           -----------------
+ *           |   length      |
+ *           -----------------
+ *           |   lineNo      |
+ *           -----------------
+ *
+ *           Variable stack (before)
+ *           ------------------
+ *   A       | VariableAddress|
+ *           ------------------
+ *   A+1     |   Index        | <-- VI
+ *           ------------------
+ *
+ *           Variable stack (after)
+ *           ------------------
+ *   A       | IndexAddress   | <-- VI
+ *           ------------------
+ *   A+1     |                |
+ *           ------------------
+ */
+void Index(Kernel k)
 {
-    uint8_t index;
+    int8_t index;
 
-    uint8_t lower = kInstance->memory[kInstance->ip];
-    uint8_t upper = kInstance->memory[kInstance->ip + 1];
-    uint8_t length = kInstance->memory[kInstance->ip + 2];
+    int8_t lower = k->memory[k->ip];
+    int8_t upper = k->memory[k->ip + 1];
+    int8_t length = k->memory[k->ip + 2];
 
-    kInstance->lineNo = kInstance->memory[kInstance->ip + 3];
+    k->lineNo = k->memory[k->ip + 3];
 
-    index = kInstance->memory[kInstance->sp];
-    kInstance->sp = kInstance->sp - 1;
+    index = k->memory[k->sp];
+    k->sp = k->sp - 1;
 
     if ((index < lower) || (index > upper))
-        runError("index exceeds array dimension", kInstance);
+        runError("index exceeds array dimension");
 
-    kInstance->memory[kInstance->sp] = kInstance->memory[kInstance->sp] + (index - lower) * length;
-    kInstance->ip += 4;
+    k->memory[k->sp] = k->memory[k->sp] + (index - lower) * length;
+    k->ip += 4;
 }
 
 /**
-    *           Program
-    *           -----------------
-    *           |   FieldOpcode |
-    *           -----------------
-    *           |   Displacement| <-- ip
-    *           -----------------
-    *
-    *           Variable stack (before)
-    *           ------------------
-    *   A       | Link           | <-- VI
-    *           ------------------
-    *   A+1     |                |
-    *           ------------------
-    *
-    *           Variable stack (after)
-    *           ------------------
-    *   A       | Link + disp    | <-- VI
-    *           ------------------
-    *   A+1     |                |
-    *           ------------------
-    *
-    */
-void Field(Kernel kInstance)
+ *           Program
+ *           -----------------
+ *           |   FieldOpcode |
+ *           -----------------
+ *           |   Displacement| <-- ip
+ *           -----------------
+ *
+ *           Variable stack (before)
+ *           ------------------
+ *   A       | Link           | <-- VI
+ *           ------------------
+ *   A+1     |                |
+ *           ------------------
+ *
+ *           Variable stack (after)
+ *           ------------------
+ *   A       | Link + disp    | <-- VI
+ *           ------------------
+ *   A+1     |                |
+ *           ------------------
+ *
+ */
+void Field(Kernel k)
 {
-    uint8_t displ = kInstance->memory[kInstance->ip];
-    kInstance->memory[kInstance->sp] = kInstance->memory[kInstance->sp] + displ;
-    kInstance->ip = kInstance->ip + 1;
+    int8_t displ = k->memory[k->ip];
+    k->memory[k->sp] = k->memory[k->sp] + displ;
+    k->ip = k->ip + 1;
 }
 //------------------------------------------- Extras
-void PutInteger(Kernel kInstance)
+void PutInteger(Kernel k)
 {
-    #if defined(Host)
-        printf("%d", kInstance->memory[kInstance->sp]);
-    #else
-        // PutS("PutInteger");
-        // PutC(intToChar(kInstance->memory[kInstance->sp]));
-    #endif
-    
-    kInstance->sp = kInstance->sp - 1;
+    // PutC(k->memory[k->sp]);
+    PutC(int16ToChar(k->memory[k->sp]));
+    k->sp = k->sp - 1;
 }
-void PutCharacter(Kernel kInstance)
+void PutCharacter(Kernel k)
 {
-    #if defined(Host)
-        printf("%c", (char)kInstance->memory[kInstance->sp]);
-    #else
-        
-        // PutS("PutCharacter");
-        // PutN();
-        // PutC(intToChar(kInstance->memory[kInstance->sp]));
-    #endif
-         
-    kInstance->sp = kInstance->sp - 1;
+    PutC((char)k->memory[k->sp]);
+    k->sp = k->sp - 1;
 }
-void PutBoolean(Kernel kInstance){
-    PutS((kInstance->memory[kInstance->sp] == 0) ? "false" : "true");
-    kInstance->sp = kInstance->sp - 1;
+void PutBoolean(Kernel k)
+{
+    PutS((k->memory[k->sp] == 0) ? "false" : "true");
+    k->sp = k->sp - 1;
 }
-void PutLine(){
-    PutN();
+void PutLine(Kernel k)
+{
+    PutS("\n");
 }
-void EndCode(){
-    //t     printf("The program terminates.\n");
+void EndCode(Kernel k)
+{
+    PutS(Equals() ? ".\n" : "F\n");
     exit(0);
 }
 
-// PUBLIC
-
-Kernel createKernel(uint16_t size) { // TODO: Init to clean up.
-    Kernel kInstance = (Kernel)malloc(sizeof(KernelDesc) * size);
-    kInstance->v1 = kInstance->v2 = 0;
-    kInstance->ip = 0;
-    kInstance->taskStackTop = 0;
-    kInstance->taskProgTop = 0;
-
-    kInstance->taskCurrent = 0;
-    kInstance->numberOfTasks = 1;
-    
-    
-    kInstance->taskQueue = createDoubleArrayTask(MAX_QUEUE);
-    
-    for (uint8_t i = 0; i < MAX_QUEUE; i++) 
-        kInstance->taskQueue[i] = (Task*)createTask(MAX_QUEUE);
-    
-
-    kInstance->itsKernelStack = (uint8_t*)malloc(sizeof(uint8_t) * MAX_KERNEL_STACK_SIZE);
-    kInstance->itsKernelSP = 0;
-
-    
-    
-    kInstance->memory = (int16_t*)malloc(sizeof(int16_t) * MAX_ADDRESS);
-    for (uint16_t i = 0; i < MAX_ADDRESS; i++) // Reset all memory locations.
-        kInstance->memory[i] = 0;
-
-    
-    kInstance->pe = 1024;
-    kInstance->bp = 0;
-    kInstance->sp = 4;
-    kInstance->memory[kInstance->sp] = 0; // no return
-    kInstance->lineNo = 0;
-    
-    return kInstance;
-}
-
-#if defined(Host)
-void load(Kernel kInstance, FILE *input)
+void run(Kernel k)
 {
-    
-    uint16_t i = kInstance->ip = kInstance->pe;
-    char line[10];
-    int16_t code;
-
-    while (fgets(line, sizeof(line), input) != NULL) {
-        code = atoi(line);
-        if (code == -1) 
-             break;
-        kInstance->memory[i] = code;
-        i++;
-    }
-
-    // Use a factory to isolate the configuration. In Lecture 6.
-
-    fclose(input);
-    //t        printf("\n%d words loaded.\n", i - pe);
-    // PutC((char)(i - kInstance->pe));
-    // PutS(" words loaded.\n");
-}
-#else
-
-void load(Kernel kInstance, int16_t *input){
-
-    uint16_t i = kInstance->ip = kInstance->pe;
-    
-    while (*input != -1) {
-        // PutS("I: ");
-        // PutX16(i);
-        // PutN();
-        kInstance->memory[i++] = *input++;
-    }
-
-    // for(uint8_t j = 0; j < track; j++)
-    // {
-    //     PutX16(kInstance->memory[j]);
-    //     PutN();
-    // }
-
-    // kInstance->ip = kInstance->ip - 1024;// = kInstance->ip - 1024;
-    // PutX16(kInstance->ip);
-    // PutN();
-    // PutX16(kInstance->memory[0]);
-
-    // for(; kInstance->ip < track; kInstance->ip++)
-    // {
-    //     PutX16(kInstance->memory[kInstance->ip]);
-    //     PutN();
-    // }
-    
-    
-    // Use a factory to isolate the configuration. In Lecture 6.
-
-    //t        printf("\n%d words loaded.\n", i - pe);
-    // PutC(intToChar(i - kInstance->pe));
-    // PutS(" words loaded.");
-    // PutN();
-}
-
-#endif
-
-void run(Kernel kInstance) {
     int16_t opcode = 0;
-
-    #if !defined(Host)
-        // kInstance->ip = kInstance->ip - 1024;
-        // kInstance->bp = kInstance->bp - 1024;
-        // kInstance->sp = kInstance->sp - 1024;
-        // kInstance->pe = kInstance->pe - 1024;
-    #endif
-    
-    while (1)
+    while (true)
     {
-        //t            printf("ip=%02x opcode=%d", (ip-1024), opcode));
-
-        // kInstance->memory[0] = 443;
-        opcode = (kInstance->memory[kInstance->ip++] - INSTR_TABLE);
-
-        // if (debug) {
-        //     PutN();
-        //     PutS("Here ");
-        //     PutX16(opcode);
-        //     PutN();
-
-        //     PutN();
-        //     PutS("OpCode");
-        //     PutX16(opcode);
-        //     PutN();
-        // } else {
-        //     printf("Opcode: %d\n", opcode);
-        // }
-       
-        // PutS("Memory: ");
-        // PutX16(kInstance->memory[kInstance->ip-1]);
-        // // PutX16(kInstance->memory[kInstance->ip - 1]);
-        // PutX16(opcode);
-        // PutN();
-        // kInstance->ip = kInstance->ip + 1;
-
-        switch (opcode)
+        // PutS("ip=%02x opcode=%d", (ip-1024), opcode);
+        switch ((opcode = k->memory[k->ip++]) - k->INSTR_TABLE)
         {
         case ENDPROC:
-            // printf("ENDPROC\n");
-
-            if (debug)
-                PutS("ENDPROC");
-
-            EndProc(kInstance);
+            EndProc(k);
             break;
         case PROCEDURE:
-            // printf("PROCEDURE\n");
-            if (debug)
-                PutS("PROCEDURE\n");
-            Procedure(kInstance);
+            Procedure(k);
             break;
         case INDEX:
-            // printf("INDEX\n");
-            if (debug)
-                PutS("INDEX\n");
-            Index(kInstance);
+            Index(k);
             break;
         case COBEGIN:
-            // printf("COBEGIN\n");
-            if (debug)
-                PutS("COBEGIN\n");
-            Cobegin(kInstance);
+            Cobegin(k);
             break;
             //          case LIBPROC:           Libproc();     break;
         case PARAMCALL:
-            // printf("PARAMCALL\n");  
-            if (debug)  
-                PutS("PARAMCALL\n");  
-            ParamCall(kInstance);
+            ParamCall(k);
             break;
         case PROCCALL:
-            // printf("PROCCALL\n");  
-            if (debug)
-                ProcCall(kInstance);
+            ProcCall(k);
             break;
         case ALSO:
-            // printf("ENDPROC\n");  
-            if (debug)
-                PutS("ENDPROC\n");  
-            Also(kInstance);
+            Also(k);
             break;
         case ELSE:
-            // printf("ELSE\n");  
-            if (debug)
-                PutS("ELSE\n");
-            Else(kInstance);
+            Else(k);
             break;
             //          case ENDLIB:            Endlib();      break;
             //          case FUNCVAL:           Funcval();     break;
             //          case PARAMARG:          Paramarg();    break;
             //          case PARAMETER:         Parameter();   break;
         case PROCARG:
-            // printf("PROCARG\n");
-            if (debug)  
-                PutS("PROCARG\n");  
-            ProcArg(kInstance);
+            ProcArg(k);
             break;
         case PROCESS:
-            // printf("PROCESS\n"); 
-            if (debug) 
-                PutS("PROCESS\n");  
-            Process(kInstance);
+            Process(k);
             break;
         case VARIABLE:
-            // printf("VARIABLE\n"); 
-            if (debug) 
-                PutS("VARIABLE\n"); 
-            Variable(kInstance);
+            Variable(k);
             break;
         case ASSIGN:
-            // printf("ASSIGN\n"); 
-            if (debug)   
-                PutS("ASSIGN\n");    
-            Assign(kInstance);
+            Assign(k);
             break;
             //          case BLANK:             Blank();       break;
         case CONSTANT:
-            // printf("CONSTANT\n");
-            if (debug)  
-                PutS("CONSTANT\n");  
-            Constant(kInstance);
+            Constant(k);
             break;
         case CONSTRUCT:
-            // printf("CONSTRUCT\n");  
-            if (debug)
-                PutS("CONSTRUCT\n"); 
-            Construct(kInstance);
+            Construct(k);
             break;
         case DO:
-            // printf("DO\n");  
-            if (debug)
-                PutS("DO\n"); 
-            Do(kInstance);
+            Do(k);
             break;
             //          case ENDIF:             EndIf();       break;
         case ENDWHEN:
-            // printf("ENDWHEN\n"); 
-            if (debug)
-                PutS("ENDWHEN\n");  
-            EndWhen(kInstance);
+            EndWhen(k);
             break;
         case EQUAL:
-            // printf("EQUAL\n");  
-            if (debug)
-                PutS("EQUAL\n"); 
-            Equal(kInstance);
+            Equal(k);
             break;
         case FIELD:
-            // printf("FIELD\n"); 
-            if (debug)
-                PutS("FIELD\n");   
-            Field(kInstance);
+            Field(k);
             break;
         case GOTO:
-            // printf("GOTO\n");
-            if (debug)
-                PutS("GOTO\n");  
-            Goto(kInstance);
+            Goto(k);
             break;
         case NOTEQUAL:
-            // printf("ENDPROC\n"); 
-            if (debug)
-                PutS("ENDPROC\n");  
-            NotEqual(kInstance);
+            NotEqual(k);
             break;
         case VALSPACE:
-            // printf("VALSPACE\n"); 
-            if (debug)
-                PutS("VALSPACE\n");   
-            ValSpace(kInstance);
+            ValSpace(k);
             break;
         case VALUE:
-            // printf("VALUE\n");  
-            if (debug)
-                PutS("VALUE\n"); 
-            Value(kInstance);
+            Value(k);
             break;
         case WAIT:
-            // printf("WAIT\n");
-            if (debug)
-                PutS("WAIT\n");  
-            Wait(kInstance);
+            Wait(k);
             break;
         case WHEN:
-            // printf("WHEN\n");  
-            if (debug)
-                PutS("WHEN\n");
-            When(kInstance);
+            When(k);
             break;
             //          case ERROR:             Error();       break;
         case ADD:
-            // printf("ADD\n");  
-            if (debug)
-                PutS("ADD\n");
-            Add(kInstance);
+            Add(k);
             break;
         case AND:
-            // printf("AND\n"); 
-            if (debug)
-                PutS("AND\n"); 
-            And(kInstance);
+            And(k);
             break;
         case DIVIDE:
-            // printf("DIVIDE\n");  
-            if (debug)
-                PutS("DIVIDE\n");  
-            Div(kInstance);
+            Div(k);
             break;
         case ENDCODE:
-            // printf("ENDCODE\n");
-            if (debug)  
-                PutS("ENDCODE\n");  
-            EndCode(kInstance);
+            EndCode(k);
             break;
         case GREATER:
-            // printf("GREATER\n");  
-            if (debug)
-                PutS("GREATER");
-            TestForGreater(kInstance);
+            TestForGreater(k);
             break;
         case LESS:
-            // printf("LESS\n");
-            if (debug)
-                PutS("LESS\n");
-            TestForLessThan(kInstance);
+            TestForLessThan(k);
             break;
         case MINUS:
-            // printf("MINUS\n");
-            if (debug)
-                PutS("MINUS\n");
-            Neg(kInstance);
+            Neg(k);
             break;
         case MODULO:
-            // printf("MODULO\n");
-            if (debug)
-                PutS("MODULO\n");
-            Mod(kInstance);
+            Mod(k);
             break;
         case MULTIPLY:
-            // printf("MULTIPLY\n");
-            if (debug)
-                PutS("MULTIPLY\n");
-            Mul(kInstance);
+            Mul(k);
             break;
         case NOT:
-            // printf("NOT\n");
-            if (debug)
-                PutS("NOT\n");
-            Not(kInstance);
+            Not(k);
             break;
         case NOTGREATER:
-            // printf("NOTGREATER\n");
-            if (debug)
-                PutS("NOTGREATER\n");
-            TestForLessOrEqual(kInstance);
+            TestForLessOrEqual(k);
             break;
         case NOTLESS:
-            // printf("NOTLESS\n");
-            if (debug)
-                PutS("NOTLESS\n");
-            TestForGreaterOrEqual(kInstance);
+            TestForGreaterOrEqual(k);
             break;
         case OR:
-            // printf("OR\n");
-            if (debug)
-                PutS("OR\n");
-            Or(kInstance);
+            Or(k);
             break;
         case SUBTRACT:
-            // printf("SUBTRACT\n");
-            if (debug)
-                PutS("SUBTRACT\n");
-            Subtract(kInstance);
+            Subtract(k);
             break;
             //          case ADDR:              Addr();        break;
             //          case HALT:              Halt();        break;
@@ -1424,42 +1257,34 @@ void run(Kernel kInstance) {
             //          case PLACE:             Place();       break;
             //          case SENSE:             Sense();       break;
         case INSTANCE:
-            // printf("INSTANCE\n");
-            if (debug)
-                PutS("INSTANCE\n");
-            Instance(kInstance);
+            Instance(k);
             break;
         case PUTI:
-            // printf("PUTI\n");
-            if (debug)
-                PutS("PUTI\n");
-            PutInteger(kInstance);
+            PutInteger(k);
             break;
         case PUTC:
-            // printf("PUTC\n");
-            if (debug)
-                PutS("Here");
-            PutCharacter(kInstance);
+            PutCharacter(k);
             break;
         case PUTB:
-            // printf("PUTB\n");
-            if (debug)
-                PutS("PUTB\n");
-            PutBoolean(kInstance);
+            PutBoolean(k);
             break;
         case PUTN:
-            // printf("PUTN\n");
-            if (debug)
-                PutS("PUTN\n");
-            PutLine(kInstance);
+            PutLine(k);
             break;
         default:
-            // printf("Unknown opcode=%d ip=%u\n", opcode, kInstance->ip);
-            // printf("Can't say gamer without GayYEEEE!!!!");
-            if (debug)
-                PutS("Default\n");
+            PutS("Unknown opcode=");
+            PutX16(opcode);
+            PutS(" ip=");
+            PutX16(k->ip);
+            PutN();
             exit(1);
         }
     }
 }
 
+void kernelClearMemory(Kernel kInstance) {
+    free(kInstance->taskQueue);
+    free(kInstance->itsKernelStack);
+    free(kInstance->memory);
+    free(kInstance);
+}

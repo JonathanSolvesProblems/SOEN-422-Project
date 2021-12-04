@@ -41,15 +41,16 @@ uint16_t GetIp(Task t){
 void SetBp(Task t, uint16_t value){
     t->bp = value;
 }
-
 void SetSp(Task t, uint16_t value){
     t->sp = value;
 }
-
 void SetPe(Task t, uint16_t value){
     t->pe = value;
 }
-
 void SetIp(Task t, uint16_t value){
     t->ip = value;
 }
+
+// void Task_Delete(Task t){
+//     free(t);
+// }
