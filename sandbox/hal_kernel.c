@@ -49,7 +49,7 @@ void Kernel_Init(Kernel k) {
     k->MAX_KERNEL_STACK_SIZE = 100;
     k->MAX_QUEUE = 10;
     k->MIN_ADDRESS = 0;
-#ifndef HOST
+#ifndef HOST // meaning if target
     k->MAX_ADDRESS = 100;
 #else
     k->MAX_ADDRESS = 20000;

@@ -21,17 +21,14 @@ static void DisplayBanner() {
 }
 
 #define MemMax 256
-#define KernelSize 40
 
 static uint8_t  mem[MemMax];
 
 int main() {
     bsl_Uart_Init();
+    uint8_t status;
 
     while (true) {
-        uint8_t status = Success;
-
-        PutC((char)Ack);
 
         if ((status = hal_Loader(mem)) == Success) {
             DisplayBanner();
@@ -40,7 +37,9 @@ int main() {
             PutC((char)Ack);
             PutC((char)0);
         } else {
-            PutS("Loader error: "); PutX4(status); PutN();
+            // PutS("Loader error: "); PutX4(status); PutN();
+            PutC((char)Nak);
+            PutC((char)0);
             return -1;
         }
     }

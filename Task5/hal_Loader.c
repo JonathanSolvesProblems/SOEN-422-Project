@@ -8,18 +8,18 @@
 
 
 uint8_t hal_Loader(uint8_t* mem) {
-    uint8_t size = bsl_Uart_RxChar();
-    uint8_t checksum = bsl_Uart_RxChar();
-    uint8_t cmd = bsl_Uart_RxChar();
+    uint8_t size = GetC();
+    uint8_t checksum = GetC();
+    uint8_t cmd = GetC();
     uint8_t sum = cmd;
 
-    for(uint8_t i = 0; i < size - DATA; i++) {
-        mem[i] = bsl_Uart_RxChar();
-        PutC((char)mem[i]);
-        sum += mem[i];
-    }
+    // for(uint8_t i = DATA; i < size; i++) {
+    //     mem[i] = GetC();
+    //     PutC((char)mem[i]);
+    //     sum += mem[i];
+    // }
 
-    // bsl_Uart_RxChar();
+    ResetBuffer();
 
     switch(cmd) {
         case GetStatus:
@@ -34,7 +34,6 @@ uint8_t hal_Loader(uint8_t* mem) {
             PutC((char)0);
             Kernel kInstance = createKernel(KERNEL_SIZE);
             loadInMemory(kInstance, mem);
-            ResetBuffer();
             run(kInstance);
             kernelClearMemory(kInstance);
             ResetBuffer();
