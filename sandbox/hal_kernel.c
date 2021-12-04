@@ -93,21 +93,21 @@ Kernel createKernel() {
 }
 
 #if defined(Host)
-    // void load(Kernel k, FILE *input)
-    // {
-    //     uint16_t i = k->ip = k->pe;
-    //     char line[10];
-    //     int16_t code;
-    //     while (fgets(line, 10, input) != NULL)
-    //     {
-    //         code = atoi(line);
-    //         k->memory[i++] = code;
-    //     }
-    //     fclose(input);
-    // }
+    void load(Kernel k, FILE *input)
+    {
+        uint16_t i = k->ip = k->pe;
+        char line[10];
+        int16_t code;
+        while (fgets(line, 10, input) != NULL)
+        {
+            code = atoi(line);
+            k->memory[i++] = code;
+        }
+        fclose(input);
+    }
 
     // FOR BIN FILES
-    void load(Kernel k, FILE *input)
+    void loadBin(Kernel k, FILE *input)
     {
         char line[256];
         uint8_t code;

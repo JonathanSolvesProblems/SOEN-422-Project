@@ -118,7 +118,7 @@ public class SerialComPort {
         // Create a new SerialPort with the same Arduino Nano settings.
         _serialPort = new SerialPort();
         _serialPort.PortName = "COM3";
-        _serialPort.BaudRate = 9600; ;
+        _serialPort.BaudRate = 9600;
         _serialPort.Parity = Parity.None;
         _serialPort.DataBits = 8;
         _serialPort.StopBits = StopBits.One;

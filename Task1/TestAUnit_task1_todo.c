@@ -83,7 +83,7 @@ int main(void) {
                 }
             } else if (cmdInt > TestMax) {
                 PutS("Invalid test number. It should be 1..");
-                PutC(intToChar(TestMax));
+                PutC(u8ToChar(TestMax));
                 PutS(" or \"0\" (zero) to quit.\n");
             }
         } 

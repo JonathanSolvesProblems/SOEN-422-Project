@@ -31,6 +31,8 @@ int main() {
     while (true) {
         uint8_t status = Success;
 
+        PutC((char)Ack);
+
         if ((status = hal_Loader(mem)) == Success) {
             DisplayBanner();
             
