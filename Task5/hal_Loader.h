@@ -11,7 +11,6 @@
 #define PacketSizeMax ((uint8_t)11)
 uint8_t packet[PacketSizeMax];
 
-
 typedef enum {
     Success = 0x40,
     // Errors during CheckPacket():
@@ -39,6 +38,6 @@ typedef enum {
 
 
 
-uint8_t hal_Loader(uint8_t* mem);
+uint8_t hal_Loader(uint8_t* mem, uint8_t loaderStatus);
 
 #endif
