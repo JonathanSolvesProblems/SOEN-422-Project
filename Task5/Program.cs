@@ -136,7 +136,7 @@ public class SerialComPort {
         readThread.Start();
 
         Console.WriteLine("Host Serial Loader v1.0 (Cm Virtual Machine on Arduino Nano)");
-        Console.WriteLine("Usage: type 'p'(ping), 'd'(download), 'r'(run), and 'q' to quit.");
+        Console.WriteLine("Usage: type 'p'(ping), 's'(getStatus), 'd'(download), 'r'(run), and 'q' to quit.");
 
         string cmd;
 
@@ -144,7 +144,6 @@ public class SerialComPort {
         Console.Write("$ ");
         while (_continue) {
             cmd = Console.ReadLine();
-
             if (stringComparer.Equals("q", cmd)) {
                 _continue = false;
             } else if (stringComparer.Equals("p", cmd)) { // ping
@@ -177,6 +176,10 @@ public class SerialComPort {
                 int size = _serialPort.Read(buffer, 0, 1);
 //t                Console.Write("size[" + string.Format("{0:X2}", buffer[0]) + "]:");
                 if (buffer[0] != 0) {
+                    // ---------------------------------DEBUG-----------------------------------------
+                    for(int i = 0; i < buffer.Length; i++)
+                        Console.WriteLine(buffer[i]);
+                    // ---------------------------------DEBUG-----------------------------------------
                     do {
                         if (!_run && (buffer[0] == Ack)) {
                             size = _serialPort.Read(buffer, 0, 1); // read the zero

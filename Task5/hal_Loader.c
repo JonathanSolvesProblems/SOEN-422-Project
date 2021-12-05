@@ -7,7 +7,7 @@
 #define KERNEL_SIZE (10)
 
 
-uint8_t hal_Loader(uint8_t* mem) {
+uint8_t hal_Loader(uint8_t* mem, uint8_t status) {
     char rcdChar;
     uint8_t packIndex = 0;
 
@@ -22,23 +22,35 @@ uint8_t hal_Loader(uint8_t* mem) {
     uint8_t size = packet[0];
     uint8_t checksum = packet[1];
     uint8_t cmd = packet[2];
-    uint8_t sum = cmd;
     uint8_t address = 0;
 
-
-    ResetBuffer();
+    
 
     switch(cmd) {
         case GetStatus:
-            return (cmd != checksum) ? ChecksumInvalid : Success;
+            PutC((char)Ack);
+            PutC((char)size);
+            PutC((char)checksum);
+            PutC((char)cmd);
+            PutC((char)status);
+            PutC((char)0);
+            return status;
+        case Download:
+            // do not finish until all packets
+            address = 0;
+            return Success;
         case SendData:
-            for(uint8_t i = DATA; i < size; i++) {
-                mem[i] = GetC();
-                PutC((char)mem[i]);
-                sum += mem[i];
-            }
-            return (sum != checksum) ? ChecksumInvalid : Success;
+            // PutC((char)Ack);
+            // PutC((char)size);
+            // PutC((char)checksum);
+            // PutC((char)cmd);
+
+            // PutC((char)0);
+
+            return (cmd != checksum) ? ChecksumInvalid : Success;
         case Ping:
+            PutC((char)Ack);
+            PutC((char)0);
             return (cmd != checksum) ? ChecksumInvalid : Success;
         case Run:
             if (cmd != checksum) return ChecksumInvalid;
@@ -49,6 +61,10 @@ uint8_t hal_Loader(uint8_t* mem) {
             run(kInstance);
             kernelClearMemory(kInstance);
             ResetBuffer();
+            return Success;
+
+        case Reset:
+
             return Success;
         default:
             return InvalidCmd;

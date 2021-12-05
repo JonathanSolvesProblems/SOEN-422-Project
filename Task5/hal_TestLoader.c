@@ -26,20 +26,18 @@ static uint8_t  mem[MemMax];
 
 int main() {
     bsl_Uart_Init();
-    uint8_t status;
+    uint8_t status = ChecksumInvalid;
 
     while (true) {
 
-        if ((status = hal_Loader(mem)) == Success) {
+        if ((status = hal_Loader(mem, status)) == Success) {
             DisplayBanner();
             
             // Send an Ack to tell the Host that program's execution is done.
-            PutC((char)Ack);
-            PutC((char)0);
+            // PutC((char)Ack);
+            // PutC((char)0);
         } else {
-            // PutS("Loader error: "); PutX4(status); PutN();
-            PutC((char)Nak);
-            PutC((char)0);
+            PutS("Loader error: "); PutX4(status); PutN();
             return -1;
         }
     }
