@@ -9,7 +9,6 @@ void DumpMemory(uint8_t* from, uint16_t nBytes){
             PutX16((uint16_t) *from);
             PutC(' ');
         }
-        // TODO: Implement offset.
         PutX8(*from++);
         PutC(' ');
     }

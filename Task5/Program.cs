@@ -174,7 +174,7 @@ public class SerialComPort {
         while (_continue) {
             try {
                 int size = _serialPort.Read(buffer, 0, 1);
-//t                Console.Write("size[" + string.Format("{0:X2}", buffer[0]) + "]:");
+                Console.Write("size[" + string.Format("{0:X2}", buffer[0]) + "]:");
                 if (buffer[0] != 0) {
                     // ---------------------------------DEBUG-----------------------------------------
                     // for(int i = 0; i < buffer.Length; i++)

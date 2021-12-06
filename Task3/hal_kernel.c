@@ -62,7 +62,7 @@ void Kernel_Init(Kernel k) {
 
     k->v1 = 0;
     k->v2 = 0;
-    k->ip = 0;
+    k->ip = 256;
     k->taskStackTop = 0;
     k->taskProgTop = 0;
 
@@ -115,7 +115,7 @@ Kernel createKernel() {
 
         for (uint8_t i = 0; i < 256; i++)
         {
-            if (line[i] == -1)
+            if (line[i] == -1) // takes first value as limiter for loop.
                 break;
 
             if (line[i] < 0)
@@ -141,6 +141,7 @@ void load(Kernel k, int16_t *input) {
 
 #endif
 
+// helper function for task 5
 void loadInMemory(Kernel k, uint8_t* input) {
     uint16_t i = k->ip = k->pe;
     while(*input) {

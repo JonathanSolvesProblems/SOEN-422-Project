@@ -34,10 +34,6 @@ int main() {
 
         if ((status = hal_Loader(mem, status, kInstance)) == Success) {
             DisplayBanner();
-            
-            // Send an Ack to tell the Host that program's execution is done.
-            // PutC((char)Ack);
-            // PutC((char)0);
         } else {
             PutS("Loader error: "); PutX4(status); PutN();
             return -1;
