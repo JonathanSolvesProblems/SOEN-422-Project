@@ -7,9 +7,9 @@ typedef struct KernelDesc {
     int8_t v1, v2;
 
     // kernel
-    int8_t MAX_KERNEL_STACK_SIZE;
-    int8_t *itsKernelStack; // stack
-    int8_t itsKernelSP;     //  sp
+    uint8_t MAX_KERNEL_STACK_SIZE;
+    uint8_t *itsKernelStack; // stack
+    uint8_t itsKernelSP;     //  sp
 
     // variable stack
     uint16_t bp; //  base pointer
@@ -20,7 +20,7 @@ typedef struct KernelDesc {
     uint16_t pe; //  program end
 
     // task
-    int8_t MAX_QUEUE;
+    uint8_t MAX_QUEUE;
 
     Task *taskQueue;     // Task taskQueue[];
     int8_t taskCurrent;   // this
@@ -36,7 +36,7 @@ typedef struct KernelDesc {
     uint16_t SET_LENGTH;
     uint8_t SET_LIMIT;
 
-    int16_t *memory;
+    uint8_t *memory;
     int8_t lineNo;
 
 } KernelDesc, *Kernel;
@@ -71,7 +71,7 @@ void Kernel_Init(Kernel k) {
     k->itsKernelStack = (int8_t*) malloc(k->MAX_KERNEL_STACK_SIZE*sizeof(int8_t));
     k->itsKernelSP = 0;
 
-    k->memory = (int16_t*) malloc(k->MAX_ADDRESS*sizeof(int16_t));
+    k->memory = (uint8_t*) malloc(k->MAX_ADDRESS*sizeof(uint8_t));
     for (int16_t i = 0; i < k->MAX_ADDRESS; i++) // Reset all memory locations.
         k->memory[i] = 0;
 
@@ -101,31 +101,6 @@ Kernel createKernel() {
         }
         fclose(input);
     }
-
-    // FOR BIN FILES
-    void loadBin(Kernel k, FILE *input)
-    {
-        char line[256];
-        uint8_t code;
-        fread(line,sizeof(line),1,input);
-
-        for (uint8_t i = 0; i < 256; i++)
-        {
-            if (line[i] == -1) // takes first value as limiter for loop.
-                break;
-
-            if (line[i] < 0)
-                code = (int8_t)line[i];
-            else
-                code = (uint8_t)line[i]; // + 128;
-            printf("%d ", code);
-
-        }
-
-        fclose(input);
-        exit(0);
-    }
-
 #else
 
 void load(Kernel k, int16_t *input) {
