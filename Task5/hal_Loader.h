@@ -4,6 +4,7 @@
 #define __hal_Loader_h
 
 #include <stdint.h>
+#include "../Task3/hal_kernel.h"
 
 #define Ack ((uint8_t)0xCC)
 #define Nak ((uint8_t)0x33)
@@ -38,6 +39,6 @@ typedef enum {
 
 
 
-uint8_t hal_Loader(uint8_t* mem, uint8_t loaderStatus);
+uint8_t hal_Loader(uint8_t* mem, uint8_t loaderStatus, Kernel kInstance);
 
 #endif

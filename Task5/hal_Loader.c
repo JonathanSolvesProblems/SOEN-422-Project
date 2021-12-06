@@ -4,9 +4,8 @@
 #include "../Task3/hal_kernel.h"
 
 #define DATA (3)
-#define KERNEL_SIZE (10)
 
-
+// helper method to return the status
 uint8_t getStatus(uint8_t cmd, uint8_t checksum, uint8_t size, uint8_t status){
     if (cmd == checksum){
         PutC((char)Ack);
@@ -23,6 +22,7 @@ uint8_t getStatus(uint8_t cmd, uint8_t checksum, uint8_t size, uint8_t status){
     }
 }
 
+// helper method to get the data that was sent
 uint8_t getSendData(uint8_t cmd, uint8_t checksum, uint8_t size, uint8_t status, uint8_t address, uint8_t* mem){
     // To get the sum of cmd and data which will be compared with checksum
     uint8_t sum = 0;
@@ -45,7 +45,8 @@ uint8_t getSendData(uint8_t cmd, uint8_t checksum, uint8_t size, uint8_t status,
     return getStatus(cmd, checksum, size, status);
 }
 
-uint8_t hal_Loader(uint8_t* mem, uint8_t status) {
+
+uint8_t hal_Loader(uint8_t* mem, uint8_t status, Kernel kInstance) {
     char rcdChar;
     uint8_t packIndex = 0;
 
@@ -85,7 +86,6 @@ uint8_t hal_Loader(uint8_t* mem, uint8_t status) {
             if (cmd != checksum) return ChecksumInvalid;
             PutC((char)Ack);
             PutC((char)0);
-            Kernel kInstance = createKernel(KERNEL_SIZE);
             loadInMemory(kInstance, mem);
             run(kInstance);
             kernelClearMemory(kInstance);

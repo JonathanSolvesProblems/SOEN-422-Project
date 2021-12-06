@@ -141,29 +141,12 @@ void load(Kernel k, int16_t *input) {
 
 #endif
 
-// TODO: TO CHANGE
-void loadInMemory(Kernel kInstance, uint8_t* memory) {
-    uint16_t i = kInstance->ip = kInstance->pe;
-    int8_t lineSize = 10;
-    char* line = (char*)malloc(sizeof(char) * lineSize);
-    int16_t code;
-    uint8_t count = 0;
-    while (*memory) {
-        if (*memory == 0x0A) {
-            code = atoi(line);
-            kInstance->memory[i++] = code;
-            memset(line, 0, lineSize);
-            count = 0;
-        }
-        else if (*memory == 0x2D) {
-            kInstance->memory[i++] = -1;
-            break;
-        } else {
-            line[count++] = *memory;
-        }
-        memory++;
-    }
-    free(line);
+void loadInMemory(Kernel k, uint8_t* input) {
+    uint16_t i = k->ip = k->pe;
+    while(*input) {
+        k->memory[i++] = *input++;
+        input++;
+    } 
 }
 
 void runError(const char *msg)

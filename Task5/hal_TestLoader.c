@@ -21,16 +21,18 @@ static void DisplayBanner() {
 }
 
 #define MemMax 256
+#define KERNEL_SIZE (10)
 
 static uint8_t  mem[MemMax];
 
 int main() {
     bsl_Uart_Init();
     uint8_t status = ChecksumInvalid;
+    Kernel kInstance = createKernel(KERNEL_SIZE);
 
     while (true) {
 
-        if ((status = hal_Loader(mem, status)) == Success) {
+        if ((status = hal_Loader(mem, status, kInstance)) == Success) {
             DisplayBanner();
             
             // Send an Ack to tell the Host that program's execution is done.
@@ -43,24 +45,3 @@ int main() {
     }
     return 0;
 }
-
-
-
-    
-
-
-
-    
-    // while (true) {
-    //     if(checkStatus == Success){
-    //         DisplayBanner();
-    //         hal_Loader(mem);
-    //         // PutC((char)Ack);
-    //         // PutC((char)0);
-    //         // PutS("Loader success!");
-    //     } else {
-    //         PutS("Loader error: "); PutX4(checkStatus); PutN();
-    //         return -1;
-    //     }
-        
-    // }
