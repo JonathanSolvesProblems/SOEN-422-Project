@@ -117,7 +117,7 @@ public class SerialComPort {
 
         // Create a new SerialPort with the same Arduino Nano settings.
         _serialPort = new SerialPort();
-        _serialPort.PortName = "COM3";
+        _serialPort.PortName = "COM5";
         _serialPort.BaudRate = 9600;
         _serialPort.Parity = Parity.None;
         _serialPort.DataBits = 8;
@@ -177,8 +177,8 @@ public class SerialComPort {
 //t                Console.Write("size[" + string.Format("{0:X2}", buffer[0]) + "]:");
                 if (buffer[0] != 0) {
                     // ---------------------------------DEBUG-----------------------------------------
-                    for(int i = 0; i < buffer.Length; i++)
-                        Console.WriteLine(buffer[i]);
+                    // for(int i = 0; i < buffer.Length; i++)
+                    //     Console.WriteLine(buffer[i]);
                     // ---------------------------------DEBUG-----------------------------------------
                     do {
                         if (!_run && (buffer[0] == Ack)) {

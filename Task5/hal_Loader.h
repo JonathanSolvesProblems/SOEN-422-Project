@@ -8,7 +8,7 @@
 #define Ack ((uint8_t)0xCC)
 #define Nak ((uint8_t)0x33)
 
-#define PacketSizeMax ((uint8_t)11)
+#define PacketSizeMax ((uint8_t)12)
 uint8_t packet[PacketSizeMax];
 
 typedef enum {
