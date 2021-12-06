@@ -1,0 +1,174 @@
+00 43  Procedure
+01 0  [00]x
+02 16 [10]x
+03 0  [00]x
+04 0  
+05 6   Constant
+06 84 
+07 74  putc
+08 6   Constant
+09 101
+0a 74  putc
+0b 6   Constant
+0c 115
+0d 74  putc
+0e 6   Constant
+0f 116
+10 74  putc
+11 6   Constant
+12 32 
+13 74  putc
+14 6   Constant
+15 97 
+16 74  putc
+17 6   Constant
+18 48 
+19 74  putc
+1a 76  putn
+1b 6   Constant
+1c 52 
+1d 74  putc
+1e 6   Constant
+1f 48 
+20 74  putc
+21 6   Constant
+22 49 
+23 74  putc
+24 6   Constant
+25 56 
+26 74  putc
+27 6   Constant
+28 48 
+29 74  putc
+2a 6   Constant
+2b 49 
+2c 74  putc
+2d 6   Constant
+2e 56 
+2f 74  putc
+30 76  putn
+31 6   Constant
+32 4  
+33 73  puti
+34 25  Instance
+35 0  
+36 49  Variable
+37 13 [0d]x
+38 6   Constant
+39 1  
+3a 24  Index
+3b 1  
+3c 8  
+3d 1  
+3e 0  
+3f 48  Value
+40 1  [01]x
+41 73  puti
+42 25  Instance
+43 0  
+44 49  Variable
+45 13 [0d]x
+46 6   Constant
+47 1  
+48 24  Index
+49 1  
+4a 8  
+4b 1  
+4c 0  
+4d 6   Constant
+4e 1  
+4f 3   Assign
+50 1  [01]x
+51 25  Instance
+52 0  
+53 49  Variable
+54 13 [0d]x
+55 6   Constant
+56 1  
+57 24  Index
+58 1  
+59 8  
+5a 1  
+5b 0  
+5c 48  Value
+5d 1  [01]x
+5e 73  puti
+5f 6   Constant
+60 8  
+61 73  puti
+62 25  Instance
+63 0  
+64 49  Variable
+65 5  [05]x
+66 6   Constant
+67 1  
+68 24  Index
+69 1  
+6a 8  
+6b 1  
+6c 0  
+6d 48  Value
+6e 1  [01]x
+6f 73  puti
+70 25  Instance
+71 0  
+72 49  Variable
+73 5  [05]x
+74 6   Constant
+75 1  
+76 24  Index
+77 1  
+78 8  
+79 1  
+7a 0  
+7b 6   Constant
+7c 1  
+7d 3   Assign
+7e 1  [01]x
+7f 25  Instance
+80 0  
+81 49  Variable
+82 5  [05]x
+83 6   Constant
+84 1  
+85 24  Index
+86 1  
+87 8  
+88 1  
+89 0  
+8a 48  Value
+8b 1  [01]x
+8c 73  puti
+8d 25  Instance
+8e 0  
+8f 49  Variable
+90 5  [05]x
+91 6   Constant
+92 8  
+93 24  Index
+94 1  
+95 8  
+96 1  
+97 0  
+98 6   Constant
+99 8  
+9a 3   Assign
+9b 1  [01]x
+9c 25  Instance
+9d 0  
+9e 49  Variable
+9f 5  [05]x
+a0 6   Constant
+a1 8  
+a2 24  Index
+a3 1  
+a4 8  
+a5 1  
+a6 0  
+a7 48  Value
+a8 1  [01]x
+a9 73  puti
+aa 76  putn
+ab 15  Endproc
+ac 12  Encode
+ad -1 

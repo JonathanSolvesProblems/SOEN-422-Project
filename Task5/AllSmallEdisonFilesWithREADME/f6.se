@@ -1,0 +1,24 @@
+proc f6
+
+var i:int
+
+proc getI : int
+begin
+  val getI := i
+end
+
+proc setI(v:int)
+begin
+  i := v
+end
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('f'); putc('6'); putn();
+    puti(1); puti(2); putn();
+
+    i := 1;
+    puti(getI); 
+    setI(2);
+    puti(getI);
+    putn()
+end

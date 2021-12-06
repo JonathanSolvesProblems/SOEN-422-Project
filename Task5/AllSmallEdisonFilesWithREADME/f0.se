@@ -1,0 +1,11 @@
+proc f0(i:int)
+
+var j:int
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('f'); putc('0'); putn();
+    putc('0'); putn();
+
+    puti(0);
+    putn()
+end

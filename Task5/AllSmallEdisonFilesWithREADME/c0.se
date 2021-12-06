@@ -1,0 +1,8 @@
+proc c0
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('c'); putc('0'); putn();
+    putc('A'); putc('#'); putn();
+
+    putc('A'); putc('#'); putn()
+end

@@ -1,0 +1,44 @@
+00 43  Procedure
+01 0  [00]x
+02 0  [00]x
+03 0  [00]x
+04 0  
+05 6   Constant
+06 84 
+07 74  putc
+08 6   Constant
+09 101
+0a 74  putc
+0b 6   Constant
+0c 115
+0d 74  putc
+0e 6   Constant
+0f 116
+10 74  putc
+11 6   Constant
+12 32 
+13 74  putc
+14 6   Constant
+15 99 
+16 74  putc
+17 6   Constant
+18 48 
+19 74  putc
+1a 76  putn
+1b 6   Constant
+1c 65 
+1d 74  putc
+1e 6   Constant
+1f 35 
+20 74  putc
+21 76  putn
+22 6   Constant
+23 65 
+24 74  putc
+25 6   Constant
+26 35 
+27 74  putc
+28 76  putn
+29 15  Endproc
+2a 12  Encode
+2b -1 

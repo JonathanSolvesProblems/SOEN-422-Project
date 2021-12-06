@@ -1,7 +1,7 @@
 /* TestSmallShell.c - Test Small Shell for Host and Arduino Nano. */
 
 #include "DumpMemory.h"
-#include "../Task1/bsl_Uart.h"
+#include "bsl_Uart.h"
 
 /*-------------------------------------------------------------------
  * main

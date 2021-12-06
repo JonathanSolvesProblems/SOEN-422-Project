@@ -1,0 +1,217 @@
+00 43  Procedure
+01 0  [00]x
+02 12 [0c]x
+03 0  [00]x
+04 0  
+05 25  Instance
+06 0  
+07 49  Variable
+08 11 [0b]x
+09 6   Constant
+0a 1  
+0b 6   Constant
+0c 65 
+0d 3   Assign
+0e 2  [02]x
+0f 25  Instance
+10 0  
+11 49  Variable
+12 13 [0d]x
+13 6   Constant
+14 2  
+15 6   Constant
+16 66 
+17 3   Assign
+18 2  [02]x
+19 25  Instance
+1a 0  
+1b 49  Variable
+1c 15 [0f]x
+1d 6   Constant
+1e 3  
+1f 6   Constant
+20 67 
+21 3   Assign
+22 2  [02]x
+23 25  Instance
+24 0  
+25 49  Variable
+26 5  [05]x
+27 6   Constant
+28 1  
+29 24  Index
+2a 1  
+2b 3  
+2c 2  
+2d 0  
+2e 25  Instance
+2f 0  
+30 49  Variable
+31 11 [0b]x
+32 48  Value
+33 2  [02]x
+34 3   Assign
+35 2  [02]x
+36 25  Instance
+37 0  
+38 49  Variable
+39 5  [05]x
+3a 6   Constant
+3b 2  
+3c 24  Index
+3d 1  
+3e 3  
+3f 2  
+40 0  
+41 25  Instance
+42 0  
+43 49  Variable
+44 13 [0d]x
+45 48  Value
+46 2  [02]x
+47 3   Assign
+48 2  [02]x
+49 25  Instance
+4a 0  
+4b 49  Variable
+4c 5  [05]x
+4d 6   Constant
+4e 3  
+4f 24  Index
+50 1  
+51 3  
+52 2  
+53 0  
+54 25  Instance
+55 0  
+56 49  Variable
+57 15 [0f]x
+58 48  Value
+59 2  [02]x
+5a 3   Assign
+5b 2  [02]x
+5c 6   Constant
+5d 84 
+5e 74  putc
+5f 6   Constant
+60 101
+61 74  putc
+62 6   Constant
+63 115
+64 74  putc
+65 6   Constant
+66 116
+67 74  putc
+68 6   Constant
+69 32 
+6a 74  putc
+6b 6   Constant
+6c 97 
+6d 74  putc
+6e 6   Constant
+6f 51 
+70 74  putc
+71 76  putn
+72 6   Constant
+73 3  
+74 73  puti
+75 6   Constant
+76 1  
+77 73  puti
+78 6   Constant
+79 65 
+7a 74  putc
+7b 6   Constant
+7c 2  
+7d 73  puti
+7e 6   Constant
+7f 66 
+80 74  putc
+81 6   Constant
+82 3  
+83 73  puti
+84 6   Constant
+85 67 
+86 74  putc
+87 76  putn
+88 6   Constant
+89 3  
+8a 73  puti
+8b 25  Instance
+8c 0  
+8d 49  Variable
+8e 11 [0b]x
+8f 48  Value
+90 1  [01]x
+91 73  puti
+92 25  Instance
+93 0  
+94 49  Variable
+95 12 [0c]x
+96 48  Value
+97 1  [01]x
+98 74  putc
+99 25  Instance
+9a 0  
+9b 49  Variable
+9c 5  [05]x
+9d 6   Constant
+9e 2  
+9f 24  Index
+a0 1  
+a1 3  
+a2 2  
+a3 0  
+a4 48  Value
+a5 1  [01]x
+a6 73  puti
+a7 25  Instance
+a8 0  
+a9 49  Variable
+aa 5  [05]x
+ab 6   Constant
+ac 2  
+ad 24  Index
+ae 1  
+af 3  
+b0 2  
+b1 0  
+b2 19  Field
+b3 1  [01]x
+b4 48  Value
+b5 1  [01]x
+b6 74  putc
+b7 25  Instance
+b8 0  
+b9 49  Variable
+ba 5  [05]x
+bb 6   Constant
+bc 3  
+bd 24  Index
+be 1  
+bf 3  
+c0 2  
+c1 0  
+c2 48  Value
+c3 1  [01]x
+c4 73  puti
+c5 25  Instance
+c6 0  
+c7 49  Variable
+c8 5  [05]x
+c9 6   Constant
+ca 3  
+cb 24  Index
+cc 1  
+cd 3  
+ce 2  
+cf 0  
+d0 19  Field
+d1 1  [01]x
+d2 48  Value
+d3 1  [01]x
+d4 74  putc
+d5 76  putn
+d6 15  Endproc
+d7 12  Encode
+d8 -1 

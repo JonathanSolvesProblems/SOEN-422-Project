@@ -1,7 +1,7 @@
 /* TestDumpMemory.c - Test Dump Memory Function for Host and Arduino Nano. */
 
 #include "DumpMemory.h"
-#include "../Task1/bsl_Uart.h"
+#include "bsl_Uart.h"
 
 /*-------------------------------------------------------------------
  * main

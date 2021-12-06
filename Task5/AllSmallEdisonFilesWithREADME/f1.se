@@ -1,0 +1,11 @@
+proc f1
+
+var i:int
+
+begin
+    putc('T'); putc('e'); putc('s'); putc('t'); putc(' '); putc('f'); putc('1'); putn();
+    putc('0'); putn();
+
+    puti(i);
+    putn()
+end

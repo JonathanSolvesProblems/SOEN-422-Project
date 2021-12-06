@@ -1,0 +1,106 @@
+00 43  Procedure
+01 0  [00]x
+02 1  [01]x
+03 0  [00]x
+04 0  
+05 21  Goto
+06 20 [14]x
+07 43  Procedure
+08 0  [00]x
+09 0  [00]x
+0a 0  [00]x
+0b 0  
+0c 25  Instance
+0d 0  
+0e 49  Variable
+0f -1 [ffffffff]x
+10 25  Instance
+11 1  
+12 49  Variable
+13 5  [05]x
+14 48  Value
+15 1  [01]x
+16 3   Assign
+17 1  [01]x
+18 15  Endproc
+19 21  Goto
+1a 20 [14]x
+1b 43  Procedure
+1c 1  [01]x
+1d 0  [00]x
+1e 0  [00]x
+1f 0  
+20 25  Instance
+21 1  
+22 49  Variable
+23 5  [05]x
+24 25  Instance
+25 0  
+26 49  Variable
+27 -1 [ffffffff]x
+28 48  Value
+29 1  [01]x
+2a 3   Assign
+2b 1  [01]x
+2c 15  Endproc
+2d 6   Constant
+2e 84 
+2f 74  putc
+30 6   Constant
+31 101
+32 74  putc
+33 6   Constant
+34 115
+35 74  putc
+36 6   Constant
+37 116
+38 74  putc
+39 6   Constant
+3a 32 
+3b 74  putc
+3c 6   Constant
+3d 102
+3e 74  putc
+3f 6   Constant
+40 54 
+41 74  putc
+42 76  putn
+43 6   Constant
+44 1  
+45 73  puti
+46 6   Constant
+47 2  
+48 73  puti
+49 76  putn
+4a 25  Instance
+4b 0  
+4c 49  Variable
+4d 5  [05]x
+4e 6   Constant
+4f 1  
+50 3   Assign
+51 1  [01]x
+52 47  Valspace
+53 1  [01]x
+54 25  Instance
+55 0  
+56 42  Proccall
+57 -79[ffffffb1]x
+58 73  puti
+59 6   Constant
+5a 2  
+5b 25  Instance
+5c 0  
+5d 42  Proccall
+5e -66[ffffffbe]x
+5f 47  Valspace
+60 1  [01]x
+61 25  Instance
+62 0  
+63 42  Proccall
+64 -92[ffffffa4]x
+65 73  puti
+66 76  putn
+67 15  Endproc
+68 12  Encode
+69 -1 
