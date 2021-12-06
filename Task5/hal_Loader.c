@@ -1,7 +1,4 @@
 #include "hal_Loader.h"
-#include "../Task1/COutForAUnit.h"
-#include "../Task1/bsl_Uart.h"
-#include "../Task3/hal_kernel.h"
 
 #define DATA (3)
 

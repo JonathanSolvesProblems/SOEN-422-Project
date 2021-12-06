@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include "../Shared/shared.h"
-#include <stdio.h> // TODO REMOVE
 
 #define MaxCharactersInLine 256
 #define MaxCharPerLine 9

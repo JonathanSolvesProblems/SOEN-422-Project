@@ -1,11 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h> 
-#include "hal_task.h"
-#include "hal_kernel.h"
-#include "../Task1/COutForAUnit.h"
-#include "private_kernel_variables.h"
-#include "../Shared/shared.h"
 #include <string.h>
+#include "hal_kernel.h"
 
 typedef struct KernelDesc {
     int8_t v1, v2;

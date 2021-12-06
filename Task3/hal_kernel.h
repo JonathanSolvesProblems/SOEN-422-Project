@@ -2,7 +2,10 @@
 #define __hal_kernel_h
 
 #include "bsl_vm.h"
+#include "hal_task.h"
 #include <stdio.h> // for FILE
+#include "../Task1/COutForAUnit.h"
+#include "private_kernel_variables.h"
 
 
 struct KernelDesc; // Forward reference
