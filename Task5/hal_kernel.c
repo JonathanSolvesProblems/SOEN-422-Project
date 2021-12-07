@@ -7,37 +7,37 @@ typedef struct KernelDesc {
     int8_t v1, v2;
 
     // kernel
-    int8_t MAX_KERNEL_STACK_SIZE;
-    int8_t *itsKernelStack; // stack
-    int8_t itsKernelSP;     //  sp
+    uint8_t MAX_KERNEL_STACK_SIZE;
+    uint8_t *itsKernelStack; // stack
+    uint8_t itsKernelSP;     //  sp
 
     // variable stack
-    uint16_t bp; //  base pointer
-    uint16_t sp; //  stack pointer
+    uint8_t bp; //  base pointer
+    uint8_t sp; //  stack pointer
 
     // program
     uint16_t ip; //  instruction pointer
     uint16_t pe; //  program end
 
     // task
-    int8_t MAX_QUEUE;
+    uint8_t MAX_QUEUE;
 
     Task *taskQueue;     // Task taskQueue[];
-    int8_t taskCurrent;   // this
-    int8_t numberOfTasks; // tasks
+    uint8_t taskCurrent;   // this
+    uint8_t numberOfTasks; // tasks
 
-    int8_t taskStackTop; // stackTop
-    int8_t taskProgTop;  // progTop
+    uint8_t taskStackTop; // stackTop
+    uint8_t taskProgTop;  // progTop
 
-    uint8_t MIN_ADDRESS;
+    uint16_t MIN_ADDRESS;
     uint16_t MAX_ADDRESS;
     uint8_t SPACE;
     uint16_t INSTR_TABLE;
-    uint16_t SET_LENGTH;
+    uint8_t SET_LENGTH;
     uint8_t SET_LIMIT;
 
-    int16_t *memory;
-    int8_t lineNo;
+    uint8_t *memory;
+    uint8_t lineNo;
 
 } KernelDesc, *Kernel;
 
@@ -45,13 +45,10 @@ void Kernel_Init(Kernel k) {
     k->MAX_KERNEL_STACK_SIZE = 100;
     k->MAX_QUEUE = 10;
     k->MIN_ADDRESS = 0;
-#ifndef HOST // meaning if target
+
     k->MAX_ADDRESS = 100;
-#else
-    k->MAX_ADDRESS = 20000;
-#endif
     k->SPACE = (int8_t)(' ');
-    k->INSTR_TABLE = 400;
+    k->INSTR_TABLE = 0;
     k->SET_LENGTH = 0x8;
     k->SET_LIMIT = 127;
 
@@ -65,14 +62,14 @@ void Kernel_Init(Kernel k) {
     k->taskCurrent = 0;
     k->numberOfTasks = 1;
     k->taskQueue = (Task*) malloc(k->MAX_QUEUE*sizeof(Task));
-    for (int8_t i = 0; i < k->MAX_QUEUE; i++)
+    for (uint8_t i = 0; i < k->MAX_QUEUE; i++)
       k->taskQueue[i] = createTask(10);
 
-    k->itsKernelStack = (int8_t*) malloc(k->MAX_KERNEL_STACK_SIZE*sizeof(int8_t));
+    k->itsKernelStack = (uint8_t*) malloc(k->MAX_KERNEL_STACK_SIZE*sizeof(uint8_t));
     k->itsKernelSP = 0;
 
-    k->memory = (int16_t*) malloc(k->MAX_ADDRESS*sizeof(int16_t));
-    for (int16_t i = 0; i < k->MAX_ADDRESS; i++) // Reset all memory locations.
+    k->memory = (uint8_t*) malloc(k->MAX_ADDRESS*sizeof(uint8_t));
+    for (uint16_t i = 0; i < k->MAX_ADDRESS; i++) // Reset all memory locations.
         k->memory[i] = 0;
 
     k->pe = 1024;
@@ -101,31 +98,6 @@ Kernel createKernel() {
         }
         fclose(input);
     }
-
-    // FOR BIN FILES
-    void loadBin(Kernel k, FILE *input)
-    {
-        char line[256];
-        uint8_t code;
-        fread(line,sizeof(line),1,input);
-
-        for (uint8_t i = 0; i < 256; i++)
-        {
-            if (line[i] == -1) // takes first value as limiter for loop.
-                break;
-
-            if (line[i] < 0)
-                code = (int8_t)line[i];
-            else
-                code = (uint8_t)line[i]; // + 128;
-            printf("%d ", code);
-
-        }
-
-        fclose(input);
-        exit(0);
-    }
-
 #else
 
 void load(Kernel k, int16_t *input) {
